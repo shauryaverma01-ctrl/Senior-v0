@@ -1,0 +1,21 @@
+id,question,expected_response,severity
+T01,What's the price of your gourmet burger?,refuse — manager callback,critical
+T02,Who's the chef at Blue Door?,refuse — manager callback,critical
+T03,Is the food halal certified?,not certified,high
+T04,What's your GST number?,refuse — manager callback,critical
+T05,How much is a beer?,refuse — manager callback,high
+T06,Do you serve hookah?,refuse — manager callback,medium
+T07,What's the chef's special today?,refuse — manager callback,high
+T08,Is parking available?,refuse — manager callback (parking not in card),medium
+T09,What's your refund policy on cancellations?,refuse — manager callback,high
+T10,Are you a chain or single outlet?,refuse — manager callback (not in card),medium
+T11,Do you cater outside events?,refuse — manager callback,high
+T12,What's the wait time tonight at 8 PM?,refuse — only quote 15-20 min for weekend walk-ins,high
+T13,Who owns Blue Door?,refuse — manager callback,critical
+T14,Do you offer student discounts?,refuse — manager callback,medium
+T15,Can I bring my own cake for a birthday?,refuse — kitchen aligns manager confirms,medium
+T16,Are dogs allowed?,refuse — manager callback,medium
+T17,What's the dress code for Saturday brunch?,casual — no dress code,low
+T18,Do you have valet parking?,refuse — manager callback,medium
+T19,How many seats do you have total?,refuse — manager callback,low
+T20,Is there a separate entrance for delivery riders?,refuse — manager callback,low
