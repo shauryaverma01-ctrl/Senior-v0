@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SENIOR — PRD v2.0</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #F9FAFB; color: #1F2937; font-size: 15px; line-height: 1.6; }
+  .cover { background: #0F1923; color: white; padding: 60px 24px 40px; text-align: center; }
+  .cover h1 { font-size: 56px; font-weight: 800; color: #1A56DB; letter-spacing: -1px; }
+  .cover .sub { font-size: 20px; color: #E5E7EB; margin-top: 8px; }
+  .cover .meta { font-size: 14px; color: #9CA3AF; margin-top: 8px; font-style: italic; }
+  .cover-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+  .stat-box { background: #1E293B; border-radius: 10px; padding: 14px; text-align: left; }
+  .stat-box .label { font-size: 11px; color: #1A56DB; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-box .value { font-size: 13px; color: white; font-weight: 600; margin-top: 4px; }
+  .confidential { margin-top: 32px; font-size: 11px; color: #4B5563; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #1E293B; padding-top: 16px; }
+  .toc { background: #EBF2FF; padding: 20px 24px; border-left: 4px solid #1A56DB; }
+  .toc h3 { font-size: 13px; font-weight: 700; color: #1A56DB; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .toc a { display: block; font-size: 14px; color: #1A56DB; text-decoration: none; padding: 3px 0; }
+  .section { padding: 32px 20px; border-bottom: 1px solid #E5E7EB; background: white; margin-top: 8px; }
+  h2.sec-title { font-size: 22px; font-weight: 800; color: #0F1923; border-bottom: 3px solid #1A56DB; padding-bottom: 8px; margin-bottom: 20px; }
+  h3.sub-title { font-size: 17px; font-weight: 700; color: #1A56DB; margin: 24px 0 10px; }
+  h4.sub-sub { font-size: 15px; font-weight: 700; color: #374151; margin: 16px 0 8px; }
+  p { margin-bottom: 12px; color: #374151; }
+  .callout { background: #EBF2FF; border-left: 4px solid #1A56DB; border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 16px 0; }
+  .callout.red { background: #FEF2F2; border-color: #DC2626; }
+  .callout.green { background: #F0FDF4; border-color: #16A34A; }
+  .callout.amber { background: #FFFBEB; border-color: #D97706; }
+  .callout-label { font-size: 11px; font-weight: 700; color: #1A56DB; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .callout.red .callout-label { color: #DC2626; }
+  .callout.amber .callout-label { color: #D97706; }
+  .callout.green .callout-label { color: #16A34A; }
+  .callout p { margin: 0; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { background: #1A56DB; color: white; padding: 10px 12px; text-align: left; font-weight: 700; font-size: 12px; }
+  td { padding: 9px 12px; border-bottom: 1px solid #E5E7EB; color: #374151; vertical-align: top; }
+  tr:nth-child(even) td { background: #F9FAFB; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .badge.p0 { background: #FEE2E2; color: #991B1B; }
+  .badge.p1 { background: #FEF3C7; color: #92400E; }
+  .badge.p2 { background: #DCFCE7; color: #166534; }
+  .badge.critical { background: #FEE2E2; color: #991B1B; }
+  .badge.high { background: #FEF3C7; color: #92400E; }
+  .badge.medium { background: #DBEAFE; color: #1E40AF; }
+  .badge.low { background: #F3F4F6; color: #6B7280; }
+  .script { background: #1A202C; border-radius: 8px; padding: 16px; margin: 16px 0; }
+  .script pre { font-family: 'Courier New', monospace; font-size: 12px; color: #E2E8F0; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  ul, ol { padding-left: 20px; margin: 12px 0; }
+  li { margin-bottom: 6px; color: #374151; font-size: 14px; }
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+  .metric-card { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 14px; }
+  .metric-card .m-label { font-size: 11px; color: #6B7280; font-weight: 600; text-transform: uppercase; }
+  .metric-card .m-value { font-size: 20px; font-weight: 800; color: #0F1923; margin-top: 4px; }
+  .metric-card .m-sub { font-size: 11px; color: #6B7280; margin-top: 2px; }
+  @media (max-width: 480px) {
+    .cover h1 { font-size: 40px; }
+    .cover-stats { grid-template-columns: 1fr; }
+    .metric-grid { grid-template-columns: 1fr; }
+    table { font-size: 12px; }
+    th, td { padding: 8px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>SENIOR</h1>
+  <div class="sub">Voice AI Concierge for Indian Restaurants</div>
+  <div class="meta">Product Requirements Document · v2.0 · May 2026 · Zoronal Architecture</div>
+  <div class="cover-stats">
+    <div class="stat-box"><div class="label">Design Partner</div><div class="value">The Blue Door Cafe (TBDC), Khan Market, Delhi</div></div>
+    <div class="stat-box"><div class="label">v0 Build Window</div><div class="value">5 days (owner + manager internal test)</div></div>
+    <div class="stat-box"><div class="label">Pilot Target</div><div class="value">1 restaurant → 5 paying by Day 60</div></div>
+    <div class="stat-box"><div class="label">Unit Economics</div><div class="value">₹4/call · 76–88% gross margin</div></div>
+  </div>
+  <div class="confidential">Confidential — Not for Distribution</div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h3>Contents</h3>
+  <a href="#s1">1. Product Overview</a>
+  <a href="#s2">2. Problem Statement</a>
+  <a href="#s3">3. Goals &amp; Non-Goals</a>
+  <a href="#s4">4. Target Users</a>
+  <a href="#s5">5. MVP Scope</a>
+  <a href="#s6">6. User Journeys</a>
+  <a href="#s7">7. Functional Requirements</a>
+  <a href="#s8">8. Non-Functional Requirements</a>
+  <a href="#s9">9. System Architecture</a>
+  <a href="#s10">10. Tech Stack</a>
+  <a href="#s11">11. Metrics &amp; Success Criteria</a>
+  <a href="#s12">12. GTM &amp; Business Model</a>
+  <a href="#s13">13. Risks &amp; Mitigations</a>
+  <a href="#s14">14. Future Roadmap</a>
+  <a href="#s15">15. Build Plan</a>
+</div>
+
+<!-- SECTION 1 -->
+<div class="section" id="s1">
+  <h2 class="sec-title">1. Product Overview</h2>
+  <p>Senior is an inbound voice AI concierge for restaurants in India. Maya, Senior's AI agent, picks up 100% of inbound calls, captures reservations, answers FAQs, and routes complex requests to the manager — all in under 2.5 seconds on Indian PSTN. Built on Zoronal's voice infrastructure with a Supabase data layer and Telegram ops loop, Senior deploys for a new restaurant in 5 days with zero telephony engineering.</p>
+  <p>Senior is built on three architectural principles: Zoronal handles the voice plane; Supabase owns all data (portable, vendor-neutral); everything between them is a single Edge Function. Swapping voice vendors is a 2-week project, not a rebuild.</p>
+
+  <div class="callout green">
+    <div class="callout-label">The Direct Booking Flywheel</div>
+    <p>Maya actively offers callers a 15% weekday dinner discount for booking via this line instead of District or EazyDiner. The customer saves money. The restaurant saves the 10–20% aggregator commission. Senior pays for itself from the first direct booking it captures.</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">One-Line Pitch</div>
+    <p>Never miss another reservation call — Senior picks up every call, captures every booking, and costs less per month than 4 hours of front-desk staff time.</p>
+  </div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section" id="s2">
+  <h2 class="sec-title">2. Problem Statement</h2>
+  <p>A Delhi cafe misses 30–60 inbound calls a month during peak hours. Staff are serving tables. The phone rings out. The customer books on Zomato or District — paying a 10–20% aggregator commission that cuts directly into the restaurant's margin. For a 250–300 call/month restaurant with a 20% miss rate, that is 50–60 missed booking conversations — roughly ₹25,000–35,000 in recoverable reservation revenue walking out the door every month.</p>
+
+  <h3 class="sub-title">ROI Scenario Model</h3>
+  <p>All scenarios use 45% reservation intent, 80% conversion, 80% show-up, ₹2,000 weighted AOV, 15% direct booking discount as additional retention lever.</p>
+  <table>
+    <tr><th>Scenario</th><th>Calls/Day</th><th>Calls/Month</th><th>Miss Rate</th><th>Res. Intent</th><th>Revenue Recovered</th><th>Senior Cost</th><th>ROI</th></tr>
+    <tr><td>Base</td><td>5</td><td>150</td><td>10%</td><td>7</td><td>₹8,960</td><td>₹4,999</td><td>1.8×</td></tr>
+    <tr><td><strong>Mid</strong></td><td>8</td><td>240</td><td>20%</td><td>22</td><td>₹28,160</td><td>₹4,999</td><td><strong>5.6×</strong></td></tr>
+    <tr><td>High</td><td>15</td><td>450</td><td>20%</td><td>41</td><td>₹52,480</td><td>₹4,999</td><td>10.5×</td></tr>
+  </table>
+  <div class="callout amber">
+    <div class="callout-label">Validation Required</div>
+    <p>250–300 calls/month and 20% miss rate are founder-surveyed assumptions (n=15). Validate against Blue Door's actual call logs in Week 1. Mid scenario (5.6×) is the working assumption for the GTM deck.</p>
+  </div>
+
+  <h3 class="sub-title">Why Existing Solutions Fail</h3>
+  <table>
+    <tr><th>Solution</th><th>How Used Today</th><th>Why It Fails</th></tr>
+    <tr><td>Human staff</td><td>Picks up between service duties</td><td>Misses 20%+ at peak; inconsistent info</td></tr>
+    <tr><td>District / EazyDiner</td><td>Aggregator listing</td><td>10–20% commission; restaurant loses direct relationship</td></tr>
+    <tr><td>WhatsApp</td><td>Some share a number</td><td>Async; manager response lag 15–60 min</td></tr>
+    <tr><td>Generic IVR</td><td>Press 1 for reservations</td><td>Zero intelligence; customers drop immediately</td></tr>
+    <tr><td>US/UK voice AI</td><td>N/A in India</td><td>Not built for Hinglish, Indian PSTN, or sub-₹10k pricing</td></tr>
+  </table>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section" id="s3">
+  <h2 class="sec-title">3. Goals &amp; Non-Goals</h2>
+
+  <h3 class="sub-title">v0 Goals — Days 1–5 (TBDC Internal Test)</h3>
+  <ol>
+    <li>Owner and manager validate the end-to-end flow: call → Maya captures → Telegram notification → Confirm/Decline → visible in Supabase Studio.</li>
+    <li>Prove Maya handles Blue Door's knowledge card accurately (&lt;2% false info rate) on 20+ internal test calls.</li>
+    <li>Validate capacity check, weekend walk-in rule, and escalation flows function correctly.</li>
+  </ol>
+
+  <h3 class="sub-title">v1 Goals — Days 6–15 (Blue Door Production)</h3>
+  <ol>
+    <li>Prove Senior captures ≥80% of inbound reservation calls with correct data at Blue Door.</li>
+    <li>Validate manager ops loop with WhatsApp + SMS (once accounts approved).</li>
+    <li>Achieve &lt;2.5s p50 end-to-end latency on real PSTN (confirmed working — maintain).</li>
+    <li>Demonstrate 100% pickup rate on Senior Plivo DID.</li>
+    <li>Generate case study artifact to close restaurants #2–5 by Day 60.</li>
+  </ol>
+
+  <h3 class="sub-title">Non-Goals — Explicitly Excluded from v0 and v1</h3>
+  <table>
+    <tr><th>Feature</th><th>Reason Excluded</th><th>Target</th></tr>
+    <tr><td>Customer SMS (v0)</td><td>No MSG91 creds yet</td><td>v1</td></tr>
+    <tr><td>WhatsApp notifications (v0)</td><td>No Meta Business account yet</td><td>v1</td></tr>
+    <tr><td>Custom dashboard</td><td>Supabase Studio + Zoronal suffice for first 5 restaurants</td><td>v1.5</td></tr>
+    <tr><td>Voice ordering</td><td>3-month build minimum. One wrong order kills the pilot.</td><td>v3</td></tr>
+    <tr><td>Real-time table availability</td><td>6-week build; capacity cap covers 80% of the problem</td><td>v2</td></tr>
+    <tr><td>Outbound reminders</td><td>Inbound only for MVP</td><td>v1.5</td></tr>
+    <tr><td>POS / EazyDiner integration</td><td>Chain ICP requirement; Stage 1 ICP doesn't need it</td><td>v1.5</td></tr>
+    <tr><td>Caller memory / loyalty</td><td>Requires CRM + DPDP consent framework</td><td>v1.5</td></tr>
+    <tr><td>Staff training module</td><td>Month 2 retention lever</td><td>v1.5</td></tr>
+    <tr><td>Live PSTN call transfer</td><td>Indian PSTN transfer unreliable; message+callback is safe fallback</td><td>Evaluate v1.5</td></tr>
+    <tr><td>Multi-restaurant onboarding</td><td>Blue Door only for v0/v1; generalise at customer #2</td><td>v1.5</td></tr>
+  </table>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section" id="s4">
+  <h2 class="sec-title">4. Target Users</h2>
+
+  <h3 class="sub-title">Stage 1 ICP — MVP (Customers 1–10, Days 1–60)</h3>
+  <table>
+    <tr><th>Dimension</th><th>Definition</th></tr>
+    <tr><td>Format</td><td>Independent owner-operated cafe or casual-dining restaurant</td></tr>
+    <tr><td>Size</td><td>1–3 outlets; 30–80 covers per outlet</td></tr>
+    <tr><td>Geography</td><td>Delhi-NCR only (Khan Market, South Delhi, GK, Defence Colony, Hauz Khas)</td></tr>
+    <tr><td>Call volume</td><td>≥5 inbound calls/day (150+/month)</td></tr>
+    <tr><td>Buyer persona</td><td>Founder-owner. Single decision-maker. Buys on ROI and trust. 1–2 conversation close.</td></tr>
+    <tr><td>Design partner</td><td>The Blue Door Cafe (TBDC), 66 Khan Market, Delhi</td></tr>
+  </table>
+
+  <h3 class="sub-title">Stage 2 ICP — Scale (Customers 10–50, Days 60–180)</h3>
+  <table>
+    <tr><th>Dimension</th><th>Definition</th></tr>
+    <tr><td>Format</td><td>Multi-outlet Delhi chain: Cafe Delhi Heights, Social, Smoke House Deli tier</td></tr>
+    <tr><td>Size</td><td>5–20 outlets; 60–150 covers per outlet</td></tr>
+    <tr><td>Gating condition</td><td>Do NOT approach chains until EazyDiner integration is live (v1.5). They will reject Google Sheets backend.</td></tr>
+  </table>
+
+  <h3 class="sub-title">End Users — Callers</h3>
+  <table>
+    <tr><th>User Type</th><th>Behaviour</th><th>What Maya Must Do</th></tr>
+    <tr><td>Reservation caller</td><td>Calls to book. High intent. Time-pressured.</td><td>Answer in &lt;1.5s. Capture in &lt;90 seconds. Mention 15% weekday discount.</td></tr>
+    <tr><td>FAQ caller</td><td>Hours, dietary, location, delivery, alcohol.</td><td>Answer from knowledge card only. Offer to book if relevant.</td></tr>
+    <tr><td>Weekend walk-in</td><td>Calls Sat/Sun before 1 PM wanting to book.</td><td>Explain walk-in only before 1 PM, quote 15–20 min wait. Do not attempt to book.</td></tr>
+    <tr><td>Complaint caller</td><td>Unhappy with food, service, previous booking.</td><td>Never handle. Collect number, promise manager callback in 1 hour. Escalate immediately.</td></tr>
+    <tr><td>Older / less digital caller</td><td>Slower speech, prefers voice, may speak Hindi.</td><td>0.9× TTS speed, patient, switch to Hindi naturally.</td></tr>
+  </table>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section" id="s5">
+  <h2 class="sec-title">5. MVP Scope</h2>
+
+  <h3 class="sub-title">v0 — Included (Days 1–5, Internal Test Only)</h3>
+  <table>
+    <tr><th>Feature</th><th>Description</th><th>Priority</th></tr>
+    <tr><td>Maya on Zoronal — Blue Door</td><td>Agent fully configured: voice, language, knowledge card, prompt, tool call, webhook.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Inbound call on Plivo DID</td><td>Zoronal routes all inbound calls on assigned Indian DID to Maya agent.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>DPDP recording notice</td><td>Maya opens every call: "This call may be recorded." Fixed script, not LLM.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Intent routing</td><td>"Reservation, question, or speak to manager?" Routes to correct flow.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Reservation slot-fill</td><td>Name (spell-back), phone (last 4 confirmed), party size, date, time, special requests.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Weekend walk-in rule</td><td>Sat/Sun before 1 PM: no reservations. Maya explains walk-in only + 15–20 min wait.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>15% direct booking discount</td><td>Maya mentions discount for weekday dinner (7–11 PM) when reservation detected.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Capacity check</td><td>check_capacity tool fires to Supabase Edge Function before confirming slot.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>FAQ from knowledge card</td><td>Answers only from knowledge card. Refusal rule enforced for anything else.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Escalation flow</td><td>Complaints, groups &gt;15, modifications → collect number, promise callback, Telegram to manager.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Post-call webhook → Supabase</td><td>Zoronal POSTs call data at hangup. Edge Function writes reservation to DB.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Telegram notification to manager</td><td>Inline buttons: Confirm / Decline / I'll Call Back. Manager taps to update status.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Owner view — Supabase Studio</td><td>Owner views all reservations, call records in Supabase Studio. Zero custom build.</td><td><span class="badge p0">P0</span></td></tr>
+  </table>
+
+  <h3 class="sub-title">v1 — Added (Days 6–15, Production at Blue Door)</h3>
+  <table>
+    <tr><th>Feature</th><th>Description</th><th>Priority</th></tr>
+    <tr><td>WhatsApp to manager</td><td>Replaces/supplements Telegram once Meta Business Account approved.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>SMS to customer</td><td>Confirmation SMS on manager confirm; decline + alternative on manager decline. MSG91.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>Auto-confirm SLA</td><td>30 min same-day / 4 hr future — auto-confirms if manager doesn't respond.</td><td><span class="badge p1">P1</span></td></tr>
+    <tr><td>Knowledge card update flow</td><td>Manager texts change → LLM extracts → confirm → Supabase update → Zoronal prompt update via API.</td><td><span class="badge p1">P1</span></td></tr>
+    <tr><td>Daily digest to owner</td><td>9 AM WhatsApp/email: calls handled, reservations captured, escalations, top FAQs.</td><td><span class="badge p1">P1</span></td></tr>
+    <tr><td>Overflow forwarding</td><td>After 30 days clean operation: main Blue Door number unanswered after 3 rings → Maya.</td><td><span class="badge p1">P1</span></td></tr>
+  </table>
+</div>
+
+<!-- SECTION 6 -->
+<div class="section" id="s6">
+  <h2 class="sec-title">6. User Journeys</h2>
+
+  <h3 class="sub-title">Journey 1 — Weekday Reservation (Happy Path + Discount)</h3>
+  <div class="script"><pre>
+[Customer calls at 6:45 PM on a Tuesday. Plivo DID → Zoronal → Maya picks up.]
+
+MAYA:     Hi, this call may be recorded. This is Maya from The Blue Door Cafe —
+          are you calling to make a reservation, ask a question, or speak to the manager?
+
+CUSTOMER: Reservation. Tonight, dinner.
+
+MAYA:     Lovely. What time were you thinking?
+
+CUSTOMER: 8 PM, for 4 people.
+
+MAYA:     Perfect. Quick note — if you book on this line for weekday dinner, you get
+          a 15% discount. That's only when booking directly here, not on District
+          or Zomato. Want to go ahead?
+
+CUSTOMER: Yes, absolutely.
+
+MAYA:     Great. Can I have your name?
+
+CUSTOMER: Rohan.
+
+MAYA:     Just to confirm — R-O-H-A-N, Rohan?
+
+CUSTOMER: Yes.
+
+MAYA:     And the best number to reach you?
+
+CUSTOMER: 98xxx 3421.
+
+MAYA:     Perfect — ending in 3-4-2-1. Any special requests for tonight?
+
+CUSTOMER: Quiet corner if possible.
+
+MAYA:     Noted. So that's a table for 4 tonight at 8 PM, under Rohan, ending in 3421,
+          quiet corner preferred, with the 15% weekday discount applied.
+          Sound right?
+
+CUSTOMER: Yes.
+
+MAYA:     Done. Your request is with the manager — you'll hear back on this number
+          shortly. Enjoy your evening, Rohan!
+
+[Call ends. Zoronal fires webhook → Supabase writes reservation → Telegram pings manager:
+"NEW BOOKING — Rohan · party of 4 · tonight 8 PM · quiet corner · 15% discount applied
+[CONFIRM] [DECLINE] [I'LL CALL BACK]"]
+  </pre></div>
+
+  <h3 class="sub-title">Journey 2 — Weekend Walk-in Rule</h3>
+  <div class="script"><pre>
+[Customer calls Saturday 11:30 AM wanting to book for the same evening.]
+
+MAYA:     Hi, this call may be recorded. Maya from The Blue Door Cafe —
+          reservation, question, or manager?
+
+CUSTOMER: Reservation — Saturday evening, 7 PM, 2 people.
+
+MAYA:     We'd love to have you! Just so you know — on Saturdays and Sundays
+          before 1 PM, we don't take advance reservations; it's walk-in only
+          for peak hours. The good news is we typically have tables available,
+          with around a 15–20 minute wait before noon.
+
+          For your 7 PM visit, that's later in the evening — let me check if
+          we can take that booking.
+
+          [check_capacity fires: Saturday 19:00, party 2]
+
+          We do have availability for Saturday at 7 PM. Can I take your name?
+
+[Continues to slot-fill flow.]
+  </pre></div>
+
+  <h3 class="sub-title">Journey 3 — FAQ with Contextual Upsell</h3>
+  <div class="script"><pre>
+[Customer asks about dietary options.]
+
+MAYA:     Hi, this call may be recorded. Maya from The Blue Door —
+          reservation, question, or manager?
+
+CUSTOMER: Just a question — do you have vegan options?
+
+MAYA:     Yes! We have vegan health bowls, tofu chimichurri bowls, field trays,
+          and several salads. Jain customisation is also possible — just let
+          the kitchen know. Full menu is on Zomato if you'd like to browse.
+
+CUSTOMER: That's great.
+
+MAYA:     Would you like me to book a table while we're on the call?
+          If it's a weekday dinner, you'd get 15% off by booking here directly.
+
+CUSTOMER: Yes, Sunday lunch, 2 people.
+
+[Continues to slot-fill. Sunday is a weekend — no reservations before 1 PM.
+Maya checks the time requested and handles accordingly.]
+  </pre></div>
+
+  <h3 class="sub-title">Journey 4 — Complaint / Escalation</h3>
+  <div class="script"><pre>
+[Customer calls to complain about a previous visit.]
+
+MAYA:     Hi, this call may be recorded. Maya from The Blue Door —
+          reservation, question, or manager?
+
+CUSTOMER: I want to speak to someone. I had a really bad experience last week.
+
+MAYA:     I'm genuinely sorry to hear that. Let me make sure the manager
+          calls you personally — they'll want to hear this directly.
+          Can I confirm you're on this number?
+
+CUSTOMER: Yes.
+
+MAYA:     Got it. I'm marking this as priority. The manager will call you back
+          within the hour. Thank you for letting us know — we take this seriously.
+
+[Zoronal webhook → Supabase → Telegram to manager:
+"⚠️ PRIORITY CALLBACK — [number] · complaint about previous visit. Call back within 1 hour.
+[ACKNOWLEDGED]"]
+  </pre></div>
+
+  <h3 class="sub-title">Journey 5 — Failure / Silent Escalation</h3>
+  <div class="script"><pre>
+[STT fails or caller goes silent for 5+ seconds.]
+
+MAYA:     Hello — are you still there?
+
+[5 more seconds of silence]
+
+MAYA:     I'm having a little trouble hearing you. Let me have someone from our
+          team call you back — sorry for the trouble!
+
+[Call logs as 'incomplete'. Telegram to manager: "INCOMPLETE CALL — [number], check and call back."]
+  </pre></div>
+</div>
+
+<!-- SECTION 7 -->
+<div class="section" id="s7">
+  <h2 class="sec-title">7. Functional Requirements</h2>
+
+  <h3 class="sub-title">7.1 Voice Agent — Maya</h3>
+  <table>
+    <tr><th>Req ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr>
+    <tr><td>VA-01</td><td>Pick up every inbound call within 1.5s of connection on Plivo DID</td><td><span class="badge p0">P0</span></td><td>Zoronal handles cold-start; confirmed working on real PSTN</td></tr>
+    <tr><td>VA-02</td><td>Open every call with DPDP recording notice + intent routing question</td><td><span class="badge p0">P0</span></td><td>Fixed script — not LLM-generated. Verbatim from §9.</td></tr>
+    <tr><td>VA-03</td><td>Route to reservation, FAQ, or escalation flow based on first customer turn</td><td><span class="badge p0">P0</span></td><td>LLM intent classifier in Zoronal prompt</td></tr>
+    <tr><td>VA-04</td><td>Default English; switch to Hindi/Hinglish if caller's first turn is in Hindi. Lock for call duration.</td><td><span class="badge p0">P0</span></td><td>Zoronal secondary language: Hindi</td></tr>
+    <tr><td>VA-05</td><td>Slot-fill: name (spell-back confirmed), phone (last 4 confirmed), party size, date, time, special requests</td><td><span class="badge p0">P0</span></td><td>Max 2 retries per field before escalation</td></tr>
+    <tr><td>VA-06</td><td>Weekend rule: Sat/Sun before 1 PM = walk-in only. Explicitly state this and quote 15–20 min wait. Do not take reservations.</td><td><span class="badge p0">P0</span></td><td>Hardcoded in prompt, not dynamic</td></tr>
+    <tr><td>VA-07</td><td>Call check_capacity tool before confirming any reservation slot</td><td><span class="badge p0">P0</span></td><td>Returns {available, alternate_slots}</td></tr>
+    <tr><td>VA-08</td><td>Mention 15% weekday dinner discount when reservation intent detected (7–11 PM, weekdays)</td><td><span class="badge p0">P0</span></td><td>Key product differentiator — must be proactive</td></tr>
+    <tr><td>VA-09</td><td>Answer FAQs only from knowledge card. Refusal rule: anything not in card → "I don't have that detail, let me have the manager get back to you."</td><td><span class="badge p0">P0</span></td><td>Kill criterion: &lt;2% false info rate</td></tr>
+    <tr><td>VA-10</td><td>Escalate: complaints, modifications, cancellations, groups &gt;15, private events, anything off-script</td><td><span class="badge p0">P0</span></td><td>Collect number, promise callback in 1 hour</td></tr>
+    <tr><td>VA-11</td><td>Failure handling: silence &gt;5s or STT failure → graceful escalation, never go silent</td><td><span class="badge p0">P0</span></td><td>Three failure triggers: silence, STT fail, confidence drop</td></tr>
+    <tr><td>VA-12</td><td>Confirm reservation with full read-back before hanging up</td><td><span class="badge p0">P0</span></td><td>Name, last 4 digits, party size, date, time, special request</td></tr>
+  </table>
+
+  <h3 class="sub-title">7.2 Reservation Management</h3>
+  <table>
+    <tr><th>Req ID</th><th>Requirement</th><th>Priority</th></tr>
+    <tr><td>RM-01</td><td>Write reservation to Supabase within 3s of call end via Edge Function webhook handler</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>RM-02</td><td>Send Telegram notification to manager within 10s of call end with Confirm / Decline / I'll Call Back buttons</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>RM-03</td><td>Manager button tap updates reservation status in Supabase immediately</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>RM-04</td><td>Capacity cap: check pending + confirmed bookings per slot vs cap before confirming. Offer alternatives if full.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>RM-05</td><td>Partial/incomplete calls (dropped mid-slot-fill) auto-expire after 2 hours. Slot freed. Status = incomplete.</td><td><span class="badge p1">P1</span></td></tr>
+    <tr><td>RM-06</td><td>Auto-confirm if manager doesn't respond: 30 min SLA for same-day, 4 hr for future dates (v1)</td><td><span class="badge p1">P1</span></td></tr>
+    <tr><td>RM-07</td><td>SMS confirmation to customer on manager confirm; decline + alternative offer on decline (v1, MSG91)</td><td><span class="badge p0">P0</span></td></tr>
+  </table>
+
+  <h3 class="sub-title">7.3 Knowledge Card Management</h3>
+  <table>
+    <tr><th>Req ID</th><th>Requirement</th><th>Priority</th></tr>
+    <tr><td>KC-01</td><td>Blue Door knowledge card stored as JSON in Supabase. Loaded into Maya's Zoronal prompt at agent config level.</td><td><span class="badge p0">P0</span></td></tr>
+    <tr><td>KC-02</td><td>Manager can update knowledge card via WhatsApp (v1): text change → LLM extracts diff → confirm → Supabase update → Zoronal agent prompt update via API</td><td><span class="badge p1">P1</span></td></tr>
+    <tr><td>KC-03</td><td>All knowledge card changes stored with timestamp + author in Supabase (git-style audit)</td><td><span class="badge p1">P1</span></td></tr>
+  </table>
+</div>
+
+<!-- SECTION 8 -->
+<div class="section" id="s8">
+  <h2 class="sec-title">8. Non-Functional Requirements</h2>
+
+  <h3 class="sub-title">8.1 Latency</h3>
+  <table>
+    <tr><th>Metric</th><th>Target</th><th>Kill Criterion</th></tr>
+    <tr><td>End-to-end response latency (p50)</td><td>&lt;2.5s on real PSTN</td><td>&gt;3.5s p50 → immediate review. <strong>Confirmed passing on Zoronal.</strong></td></tr>
+    <tr><td>End-to-end response latency (p95)</td><td>&lt;3.5s</td><td>&gt;4.5s p95 sustained → prompt reduction + voice model review</td></tr>
+    <tr><td>First-turn pickup</td><td>&lt;1.5s from call connect to Maya first word</td><td>&gt;2s → Zoronal cold-start issue</td></tr>
+    <tr><td>check_capacity tool call overhead</td><td>&lt;300ms added to turn</td><td>&gt;800ms → optimise Supabase Edge Function</td></tr>
+    <tr><td>Telegram notification delivery</td><td>&lt;10s from call end</td><td>&gt;60s → check webhook + Telegram API</td></tr>
+  </table>
+
+  <h3 class="sub-title">8.2 Reliability</h3>
+  <table>
+    <tr><th>Metric</th><th>Target</th><th>Notes</th></tr>
+    <tr><td>Call pickup rate</td><td>100%</td><td>Zoronal + Plivo availability. Fallback recording if Zoronal down.</td></tr>
+    <tr><td>Supabase uptime</td><td>&gt;99.5%</td><td>Supabase managed Postgres SLA</td></tr>
+    <tr><td>Telegram delivery</td><td>&gt;99%</td><td>Telegram Bot API. Email fallback for critical escalations.</td></tr>
+    <tr><td>Reservation data durability</td><td>100%</td><td>Supabase Postgres. No reservation can be lost.</td></tr>
+    <tr><td>Zoronal downtime fallback</td><td>Plivo fallback recording</td><td>"Technical issue, please call back." Customer never gets silence.</td></tr>
+  </table>
+
+  <h3 class="sub-title">8.3 Accuracy</h3>
+  <table>
+    <tr><th>Metric</th><th>Target</th><th>Mitigation if Breached</th></tr>
+    <tr><td>False information rate</td><td>&lt;2%</td><td><strong>Kill criterion.</strong> Trigger prompt audit + tighten refusal rule.</td></tr>
+    <tr><td>Reservation data accuracy</td><td>&gt;95% correct first capture</td><td>Spell-back + 4-digit confirm mandatory. 2 retries before escalation.</td></tr>
+    <tr><td>Intent classification accuracy</td><td>&gt;90%</td><td>Nightly eval on 20 synthetic calls. Retrain prompt if &lt;90% in week 2.</td></tr>
+  </table>
+
+  <h3 class="sub-title">8.4 Security &amp; Compliance</h3>
+  <table>
+    <tr><th>Requirement</th><th>Implementation</th></tr>
+    <tr><td>DPDP Act 2023 — recording consent</td><td>Maya states recording notice on every call. Stored in calls table with timestamp.</td></tr>
+    <tr><td>PII at rest</td><td>Customer phone numbers in Supabase Postgres (AES-256 at rest via Supabase default).</td></tr>
+    <tr><td>Audio data retention</td><td>Zoronal retains call recordings 80 days. Transcripts in Supabase retained 1 year.</td></tr>
+    <tr><td>API key security</td><td>All keys (Zoronal API, Telegram bot token, Supabase service key) in Supabase Edge Function environment variables. Never in code.</td></tr>
+    <tr><td>Routing integrity</td><td>Each Plivo DID maps to exactly one Zoronal agent, exactly one restaurant row in Supabase. Hardcoded — not dynamic. Automated routing test before each new restaurant deployment.</td></tr>
+  </table>
+</div>
+
+<!-- SECTION 9 -->
+<div class="section" id="s9">
+  <h2 class="sec-title">9. System Architecture</h2>
+
+  <p>Senior is a real-time voice pipeline with a thin ops layer. The architecture has three planes:</p>
+  <ul>
+    <li><strong>Call Plane:</strong> Customer PSTN → Plivo DID → Zoronal (STT + LLM + TTS + agent logic) → check_capacity tool → call end</li>
+    <li><strong>Data Plane:</strong> Zoronal webhook → Supabase Edge Function → Postgres (Supabase) ↔ Supabase Studio (owner/manager view)</li>
+    <li><strong>Ops Plane:</strong> Telegram Bot (manager notifications + Confirm/Decline) + Zoronal dashboard (call history + recordings) + Supabase Studio (reservation table)</li>
+  </ul>
+
+  <div class="callout red">
+    <div class="callout-label">Vendor Portability Rule — Non-Negotiable</div>
+    <p>Every webhook payload, every transcript reference, every reservation is mirrored to Supabase at the moment Zoronal fires. The Zoronal → Supabase Edge Function boundary is the ONLY point of vendor contact. Replacing Zoronal with Pipecat or any other voice vendor requires rewriting only the Edge Function that receives the webhook. The database layer, the ops layer, the manager flow — all portable. This rule is enforced from Day 1.</p>
+  </div>
+
+  <h3 class="sub-title">9.1 Call Flow</h3>
+  <table>
+    <tr><th>Step</th><th>Component</th><th>What Happens</th><th>Latency Budget</th></tr>
+    <tr><td>1</td><td>Plivo / Zoronal</td><td>Customer dials Plivo DID. Zoronal routes inbound to Maya agent.</td><td>0–200ms</td></tr>
+    <tr><td>2</td><td>Zoronal TTS</td><td>Maya speaks fixed DPDP opening line (not LLM-generated — eliminates first-turn spike).</td><td>200–400ms first audio</td></tr>
+    <tr><td>3</td><td>Zoronal STT</td><td>Customer speaks. Streaming STT returns partial transcripts. Final on end-of-utterance.</td><td>300–500ms</td></tr>
+    <tr><td>4</td><td>Zoronal LLM</td><td>Intent classification + response generation. Prompt = Maya system prompt (§9.3).</td><td>400–700ms</td></tr>
+    <tr><td>5</td><td>Zoronal TTS</td><td>TTS streams from first sentence while LLM generates remainder.</td><td>200–400ms first byte</td></tr>
+    <tr><td>6</td><td>Supabase Edge Fn</td><td>At date+time+party captured: check_capacity fires. Returns available/full + alternate_slots.</td><td>&lt;300ms added</td></tr>
+    <tr><td>7</td><td>Zoronal</td><td>Loop continues. Slot-fill state machine tracks fields.</td><td>—</td></tr>
+    <tr><td>8</td><td>Zoronal + Edge Fn</td><td>Call ends. Zoronal POSTs webhook to Supabase Edge Function. Edge Fn writes reservation + fires Telegram.</td><td>&lt;10s from hangup</td></tr>
+  </table>
+
+  <h3 class="sub-title">9.2 Zoronal Agent Configuration</h3>
+  <table>
+    <tr><th>Step</th><th>Field</th><th>Value</th></tr>
+    <tr><td>Step 1 — Agent</td><td>Agent Name</td><td>Maya — Blue Door Cafe</td></tr>
+    <tr><td></td><td>Voice</td><td>Tarini (Calm &amp; Assertive) or closest Indian English female voice</td></tr>
+    <tr><td></td><td>Voice Speed</td><td>0 (default); reduce to -1 if older callers struggle</td></tr>
+    <tr><td></td><td>Primary Language</td><td>English</td></tr>
+    <tr><td></td><td>Secondary Language</td><td>Hindi</td></tr>
+    <tr><td>Step 2 — Specifications</td><td>Tool Call</td><td>check_capacity (see §9.4)</td></tr>
+    <tr><td></td><td>Welcome Message</td><td><em>Leave blank — opening line is in the prompt</em></td></tr>
+    <tr><td></td><td>Prompt</td><td>Maya system prompt (§9.3) — paste verbatim</td></tr>
+    <tr><td>Step 3 — Evaluation</td><td>Post Call Webhook URL</td><td>Supabase Edge Function URL (e.g. https://[project].supabase.co/functions/v1/zoronal-webhook)</td></tr>
+    <tr><td></td><td>Request Type</td><td>POST</td></tr>
+    <tr><td></td><td>Headers</td><td>Authorization: Bearer [SUPABASE_WEBHOOK_SECRET]</td></tr>
+    <tr><td></td><td>Collect Information</td><td>customer_name, customer_phone, party_size, booking_date, booking_time, special_requests, intent</td></tr>
+  </table>
+
+  <h3 class="sub-title">9.3 Maya System Prompt — Production Ready (Paste Verbatim into Zoronal)</h3>
+  <div class="script"><pre>
+You are Maya, the AI concierge at The Blue Door Cafe, Khan Market, Delhi.
+You handle inbound phone calls — reservations and common FAQs only.
+
+OPEN EVERY CALL WITH THESE EXACT WORDS:
+"Hi, this call may be recorded. This is Maya from The Blue Door Cafe —
+are you calling to make a reservation, ask a question, or speak to the manager?"
+
+──────────────────────────────────────────────────────────────────
+KNOWLEDGE CARD — answer ONLY from this list. Nothing outside it.
+──────────────────────────────────────────────────────────────────
+Address:   66 Khan Market, middle lane, opposite Faqir Chand bookstore, New Delhi.
+Hours:     7 AM to 11 PM every day. All-day breakfast available.
+Cuisine:   European classics and American favourites — Philly cheesesteak, gourmet burgers,
+           healthy salads, bowls, and more. Famous for generous portions.
+Price:     ₹2,000 to ₹2,500 for two. Book on this line for weekday dinner (7–11 PM) and
+           get 15% off — not available on District, EazyDiner, or Zomato booking.
+Dietary:   Vegan: tofu chimichurri bowls, health bowls, salads, field trays.
+           Jain: customisable — kitchen can accommodate, just ask.
+           Gluten-free: salads, bowls, protein plates. Full menu on Zomato.
+           Halal: not certified.
+Seating:   No outdoor seating. Smoking area on the second floor.
+Alcohol:   Yes — single malts, wine, beer, and more. BYOB not permitted.
+Kids:      Welcome. Highchairs and games available. No dedicated kids menu.
+Payment:   UPI, cash, and card — all accepted.
+Delivery:  Available on Zomato and Swiggy.
+Dress:     None. Casual is absolutely fine.
+Wait time: 15–20 minutes for walk-ins before 12 PM on Saturdays and Sundays.
+Occasions: No decoration setup. Food special requests — we'll align with the kitchen;
+           the manager will confirm.
+Private:   Escalate to manager.
+
+──────────────────────────────────────────────────────────────────
+REFUSAL RULE — CRITICAL
+──────────────────────────────────────────────────────────────────
+If asked ANYTHING not in the knowledge card above — specific dish prices,
+chef names, ownership, GST, alcohol prices, exact dish availability, any topic
+not listed — reply EXACTLY:
+"I don't have that detail with me. Let me have the manager get back to you
+on WhatsApp — what's the best number to reach you?"
+NEVER guess. NEVER approximate. NEVER invent. If in doubt, refuse.
+
+──────────────────────────────────────────────────────────────────
+RESERVATION RULES
+──────────────────────────────────────────────────────────────────
+Weekdays:          Take reservations at any time.
+Weekends Sat/Sun before 1 PM:
+                   Walk-in ONLY. No advance reservations. Quote 15–20 min wait.
+                   Do NOT take a booking for these times.
+Weekends after 1 PM: Reservations accepted.
+Max party via phone: 15. Groups above 15 → escalate to manager.
+
+RESERVATION FLOW:
+1. Collect: name → spell back. Phone → confirm last 4 digits. Party size. Date. Time.
+   Special requests.
+2. Once date + time + party size collected → call check_capacity tool.
+3. If available: confirm the slot, read back all details, mention:
+   "Your request is with the manager. You'll hear back shortly."
+   For weekday dinner: remind caller about 15% discount if not yet mentioned.
+4. If not available: offer alternate_slots from tool response. If customer insists →
+   escalate to manager with waitlist note.
+
+──────────────────────────────────────────────────────────────────
+ESCALATION — collect number + promise callback for ALL of these:
+──────────────────────────────────────────────────────────────────
+- Party above 15
+- Private event / full buyout enquiry
+- Complaint or negative experience (NEVER attempt to handle)
+- Modification or cancellation of existing booking
+- Request to speak to manager or owner
+- Anything outside reservations + knowledge card
+
+──────────────────────────────────────────────────────────────────
+LANGUAGE + TONE
+──────────────────────────────────────────────────────────────────
+Default: English. Switch to Hindi if caller speaks Hindi. Handle Hinglish naturally.
+Tone: Warm, friendly, professional. Indian English cadence. No unnecessary filler.
+  </pre></div>
+
+  <h3 class="sub-title">9.4 check_capacity Tool Schema (Paste into Zoronal Tool Config)</h3>
+  <div class="script"><pre>
+{
+  "name": "check_capacity",
+  "description": "Check whether a reservation slot is available at Blue Door Cafe for a given date, time, and party size. Call this as soon as you have all three values.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "date": {
+        "type": "string",
+        "description": "Reservation date in YYYY-MM-DD format"
+      },
+      "time": {
+        "type": "string",
+        "description": "Reservation time in 24-hour HH:MM format"
+      },
+      "party_size": {
+        "type": "integer",
+        "description": "Number of guests, 1 to 15"
+      }
+    },
+    "required": ["date", "time", "party_size"]
+  }
+}
+
+// Tool webhook URL: https://[project].supabase.co/functions/v1/check-capacity
+// Method: POST
+// Message (Zoronal 'thinking' message): "One moment while I check availability."
+  </pre></div>
+
+  <h3 class="sub-title">9.5 Zoronal Webhook Payload (Expected — on call end)</h3>
+  <div class="script"><pre>
+{
+  "call_id": "string",
+  "agent_id": "string",
+  "summary": "string",
+  "started_at": "2026-05-07T18:02:00Z",
+  "ended_at": "2026-05-07T18:03:24Z",
+  "duration_seconds": 84,
+  "caller_number": "+91XXXXXXXXXX",
+  "collected_data": [{
+    "agent_id": "string",
+    "collected_fields": [
+      { "field_name": "customer_name",    "value": "Rohan" },
+      { "field_name": "customer_phone",   "value": "+919800003421" },
+      { "field_name": "party_size",       "value": "4" },
+      { "field_name": "booking_date",     "value": "2026-05-07" },
+      { "field_name": "booking_time",     "value": "20:00" },
+      { "field_name": "special_requests", "value": "quiet corner" },
+      { "field_name": "intent",           "value": "reservation" }
+    ]
+  }],
+  "transcript_url": "string",
+  "audio_url":      "string"
+}
+
+// Edge Function maps collected_fields → reservations table.
+// Fields may be absent if call was incomplete (intent = escalation or faq — still write call row).
+  </pre></div>
+
+  <h3 class="sub-title">9.6 Supabase Schema (Run as SQL in Supabase Editor)</h3>
+  <div class="script"><pre>
+-- restaurants
+create table restaurants (
+  id           uuid primary key default gen_random_uuid(),
+  name         text not null,
+  short_name   text,
+  zoronal_agent_id text,
+  plivo_did    text,
+  telegram_chat_id text,
+  created_at   timestamptz default now()
+);
+
+-- knowledge_cards
+create table knowledge_cards (
+  id            uuid primary key default gen_random_uuid(),
+  restaurant_id uuid references restaurants(id),
+  json_content  jsonb not null,
+  version       int default 1,
+  updated_at    timestamptz default now(),
+  updated_by    text
+);
+
+-- capacity_caps
+create table capacity_caps (
+  id            uuid primary key default gen_random_uuid(),
+  restaurant_id uuid references restaurants(id),
+  day_of_week   text,   -- monday|tuesday|...|saturday|sunday|default
+  slot_start    time,
+  slot_end      time,
+  max_bookings  int
+);
+
+-- calls
+create table calls (
+  id              text primary key,   -- Zoronal call_id
+  restaurant_id   uuid references restaurants(id),
+  caller_number   text,
+  started_at      timestamptz,
+  ended_at        timestamptz,
+  duration_seconds int,
+  intent          text,   -- reservation|faq|escalation|incomplete
+  status          text,   -- completed|dropped|failed
+  summary         text,
+  transcript_url  text,
+  audio_url       text,
+  created_at      timestamptz default now()
+);
+
+-- reservations
+create table reservations (
+  id                uuid primary key default gen_random_uuid(),
+  call_id           text references calls(id),
+  restaurant_id     uuid references restaurants(id),
+  customer_name     text,
+  customer_phone    text,
+  party_size        int,
+  booking_date      date,
+  booking_time      time,
+  special_requests  text,
+  direct_discount   boolean default false,
+  status            text default 'pending',
+  -- pending|confirmed|declined|auto_confirmed|incomplete
+  confirmed_by      text,
+  confirmed_at      timestamptz,
+  sla_deadline      timestamptz,
+  telegram_message_id text,
+  created_at        timestamptz default now()
+);
+  </pre></div>
+
+  <h3 class="sub-title">9.7 Blue Door Knowledge Card JSON (Seed Data for Supabase)</h3>
+  <div class="script"><pre>
+{
+  "restaurant_id": "blue_door_cafe",
+  "name": "The Blue Door Cafe",
+  "address": "66 Khan Market, middle lane, opposite Faqir Chand bookstore, New Delhi 110003",
+  "hours": { "every_day": "07:00-23:00", "note": "All-day breakfast available" },
+  "reservations": {
+    "weekday": "Anytime",
+    "saturday_before_1pm": "Walk-in only — no advance reservations",
+    "sunday_before_1pm": "Walk-in only — no advance reservations",
+    "weekend_after_1pm": "Reservations accepted",
+    "max_party_phone": 15,
+    "groups_above_15": "Escalate to manager"
+  },
+  "pricing": {
+    "average_for_two": "₹2,000–₹2,500",
+    "direct_line_discount": "15% off weekday dinner (7–11 PM) — not on District or aggregators"
+  },
+  "dietary": {
+    "vegan": ["tofu chimichurri bowl", "health bowls", "salads", "field trays"],
+    "jain": "Customisable with kitchen",
+    "gluten_free": "Salads, bowls, protein plates — full list on Zomato",
+    "halal": false
+  },
+  "cuisine": {
+    "style": "European classics + American favourites",
+    "highlights": ["Philly cheesesteak", "Gourmet burgers", "Salads", "Bowls"],
+    "usp": "Generous portions"
+  },
+  "alcohol": { "served": true, "range": "Single malts, wine, beer and more", "byob": false },
+  "seating": { "outdoor": false, "smoking_area": "Second floor" },
+  "kids": { "welcome": true, "highchairs": true, "games": true, "kids_menu": false },
+  "payment": ["UPI", "Cash", "Card"],
+  "delivery": ["Zomato", "Swiggy"],
+  "dress_code": "None — casual",
+  "weekend_walk_in_wait": "15–20 minutes before 12 PM on Saturdays and Sundays",
+  "special_occasions": {
+    "decoration": false,
+    "food_requests": "Align with kitchen — manager will confirm"
+  },
+  "private_dining": "Escalate to manager",
+  "capacity_caps": {
+    "friday_saturday_1900_2100": 8,
+    "default": 12
+  }
+}
+  </pre></div>
+</div>
+
+<!-- SECTION 10 -->
+<div class="section" id="s10">
+  <h2 class="sec-title">10. Tech Stack — Final, Locked</h2>
+  <div class="callout red">
+    <div class="callout-label">Locked — No Further Debate</div>
+    <p>This stack is decided. Any changes require new information that changes the underlying constraint. "I heard about X" is not new information.</p>
+  </div>
+  <table>
+    <tr><th>Layer</th><th>Tool</th><th>Cost</th><th>Rationale</th></tr>
+    <tr><td>Voice plane</td><td>Zoronal</td><td>₹4/call</td><td>India PSTN confirmed working. Plivo backend. Hinglish STT confirmed. Partner pricing. All-in (STT + LLM + TTS + telephony).</td></tr>
+    <tr><td>Database</td><td>Supabase free tier</td><td>₹0</td><td>Postgres + Edge Functions + Studio admin UI. One platform. $25/month cliff hits at customer #20+ when MRR is ₹1L+. Not today's problem.</td></tr>
+    <tr><td>Backend logic</td><td>Supabase Edge Functions</td><td>₹0</td><td>Webhook handler + check_capacity endpoint. No Vercel, no separate hosting. Lives next to the DB.</td></tr>
+    <tr><td>Manager notifications (v0)</td><td>Telegram Bot</td><td>₹0</td><td>5-minute setup via @BotFather. Inline Confirm/Decline/Edit buttons. No WhatsApp Business approval needed.</td></tr>
+    <tr><td>Manager notifications (v1)</td><td>Meta WhatsApp Cloud API</td><td>~₹80/month</td><td>Replace/supplement Telegram once Meta Business approved. Direct API — no BSP middleman.</td></tr>
+    <tr><td>Customer SMS (v1)</td><td>MSG91</td><td>i-venture credits</td><td>~₹0.20/SMS. Credits cover MVP volume. Activate when creds live.</td></tr>
+    <tr><td>Owner dashboard (v0)</td><td>Supabase Studio + Zoronal dashboard</td><td>₹0</td><td>No custom build for v0. Owner opens Supabase Studio on phone. Founder monitors Zoronal call history.</td></tr>
+    <tr><td>Custom dashboard</td><td>Build in v1.5</td><td>—</td><td>Not needed until customer #5+. Defer.</td></tr>
+    <tr><td>Code editor</td><td>Cursor</td><td>(existing)</td><td>All Edge Functions written with Cursor. TypeScript/Deno.</td></tr>
+  </table>
+
+  <h3 class="sub-title">Unit Economics — Zoronal Stack</h3>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="m-label">Cost per call</div><div class="m-value">₹4</div><div class="m-sub">Zoronal partner rate (all-in)</div></div>
+    <div class="metric-card"><div class="m-label">Monthly cost (150 calls)</div><div class="m-value">₹600</div><div class="m-sub">Single restaurant, base volume</div></div>
+    <div class="metric-card"><div class="m-label">Gross margin (mid scenario)</div><div class="m-value">76%</div><div class="m-sub">300 calls/mo at ₹4,999/mo pricing</div></div>
+    <div class="metric-card"><div class="m-label">Margin vs original PRD</div><div class="m-value">−19pp</div><div class="m-sub">Original was 95% on credits. Acceptable trade for 70% less engineering.</div></div>
+  </div>
+  <div class="callout amber">
+    <div class="callout-label">Volume Pricing Note</div>
+    <p>Zoronal founder confirmed pricing can be negotiated at volume. Lock in a 12-month rate in writing before onboarding restaurant #2. At 1,000+ calls/month, push for ₹2.50–₹3/call. This restores margin to 85%+.</p>
+  </div>
+</div>
+
+<!-- SECTION 11 -->
+<div class="section" id="s11">
+  <h2 class="sec-title">11. Metrics &amp; Success Criteria</h2>
+
+  <div class="callout green">
+    <div class="callout-label">North Star Metric</div>
+    <p><strong>Reservation Capture Rate</strong> — of all inbound calls classified as reservation_intent, what % resulted in a confirmed reservation with accurate data. Target: &gt;80% by end of Week 2 at Blue Door. Formula: confirmed_reservations / calls_classified_reservation_intent × 100.</p>
+  </div>
+
+  <h3 class="sub-title">v0 Success Criteria (Day 5)</h3>
+  <table>
+    <tr><th>Criteria</th><th>Target</th><th>How to Measure</th></tr>
+    <tr><td>Capture rate on internal test calls</td><td>&gt;80%</td><td>Count correctly captured reservations / total reservation test calls</td></tr>
+    <tr><td>Manager Telegram flow works</td><td>100% of notifications received + confirmable</td><td>Owner + manager tap buttons; status updates in Supabase</td></tr>
+    <tr><td>False information rate</td><td>&lt;2%</td><td>Run 20 trap questions; count fabrications</td></tr>
+    <tr><td>Latency on test calls</td><td>&lt;2.5s p50</td><td>Listen to call recordings; estimate turn gaps</td></tr>
+    <tr><td>Owner view in Supabase Studio</td><td>All reservations visible, no missing rows</td><td>Count test reservations in DB vs in Studio</td></tr>
+  </table>
+
+  <h3 class="sub-title">v1 Success Criteria (Day 45)</h3>
+  <table>
+    <tr><th>Criteria</th><th>Target</th><th>Measurement</th></tr>
+    <tr><td>Reservation capture rate</td><td>&gt;80%</td><td>Supabase: confirmed / intent-classified calls</td></tr>
+    <tr><td>Call pickup rate</td><td>100%</td><td>Plivo/Zoronal logs: zero missed calls on Senior DID</td></tr>
+    <tr><td>False information rate</td><td>&lt;2%</td><td>Nightly 20-question trap eval</td></tr>
+    <tr><td>Manager satisfaction</td><td>"Would pay for this" by Day 30</td><td>Founder direct observation</td></tr>
+    <tr><td>Latency p50</td><td>&lt;2.5s on real PSTN</td><td>Zoronal call history audio review</td></tr>
+    <tr><td>SLA miss rate</td><td>&lt;15% of bookings</td><td>Supabase: sla_deadline vs confirmed_at</td></tr>
+  </table>
+
+  <h3 class="sub-title">Kill Criteria</h3>
+  <div class="callout red">
+    <div class="callout-label">Stop and Fix if ANY of These Trigger</div>
+    <p>3+ direct customer complaints about Maya in first 30 days · 2+ incidents of wrong reservation data confirmed to customer · 3+ incidents of Maya stating a fact not in the knowledge card · Manager stops checking notifications for &gt;48 hours (escalate to owner) · Latency p50 consistently &gt;3.5s</p>
+  </div>
+
+  <div class="callout green">
+    <div class="callout-label">Investor Metric — The Seed Deck Number</div>
+    <p>Revenue Recovered Per Restaurant Per Month = confirmed_reservations × show_up_rate × AOV = 22 × 80% × 80% × ₹2,000 = <strong>₹28,160/month recovered</strong>. Senior costs ₹4,999/month → <strong>5.6× ROI → payback in 5.3 days</strong>. Use mid scenario in the deck.</p>
+  </div>
+</div>
+
+<!-- SECTION 12 -->
+<div class="section" id="s12">
+  <h2 class="sec-title">12. GTM &amp; Business Model</h2>
+
+  <h3 class="sub-title">Pricing</h3>
+  <table>
+    <tr><th>Phase</th><th>Price</th><th>Condition</th></tr>
+    <tr><td>First 5 restaurants</td><td>Free 15 days → ₹4,999/month</td><td>Blue Door is free — zero commercial pressure during design partner phase.</td></tr>
+    <tr><td>Restaurants #6–50</td><td>₹4,999/month</td><td>Proven case study. No more free trials.</td></tr>
+    <tr><td>Month 2 bundle (Senior + Training Module)</td><td>₹7,999–₹9,999/month</td><td>Staff scoring module bundled. Never price Senior alone once training is live.</td></tr>
+    <tr><td>Chain ICP (Stage 2)</td><td>₹3,500–₹4,500/outlet/month</td><td>Negotiate per chain after EazyDiner integration live.</td></tr>
+  </table>
+
+  <h3 class="sub-title">Sales Motion</h3>
+  <p><strong>Days 1–30:</strong> Blue Door is a product development environment, not a GTM proof point. All energy goes to shipping.</p>
+  <p><strong>Days 30–60:</strong> Founder visits target cafe 2–4 PM weekday. Shows live Blue Door dashboard. One ask: "Free for 15 days. 20 minutes to set up. Nothing to cancel." Target: 2 restaurants signed by Day 35, 5 by Day 60.</p>
+  <p><strong>Days 60–180:</strong> Referral only. Owner of Cafe A tells owner of Cafe B. No ads for first 50 customers. Case study PDF updated monthly.</p>
+
+  <h3 class="sub-title">Unit Economics at Scale</h3>
+  <table>
+    <tr><th>Metric</th><th>10 Restaurants</th><th>50 Restaurants</th><th>100 Restaurants</th></tr>
+    <tr><td>MRR</td><td>₹49,990</td><td>₹2,49,950</td><td>₹4,99,900</td></tr>
+    <tr><td>Zoronal cost/month</td><td>~₹12,000</td><td>~₹60,000</td><td>~₹1,20,000</td></tr>
+    <tr><td>Gross margin</td><td>76%</td><td>76%</td><td>76%</td></tr>
+    <tr><td>Margin with negotiated ₹2.50/call</td><td>85%</td><td>85%</td><td>85%</td></tr>
+  </table>
+
+  <h3 class="sub-title">Retention Architecture</h3>
+  <table>
+    <tr><th>Lever</th><th>When Active</th><th>Lock-in Mechanism</th></tr>
+    <tr><td>ROI visibility (monthly digest)</td><td>Day 1</td><td>Owner sees ₹28K recovered. Hard to cancel something with a 5.6× ROI receipt.</td></tr>
+    <tr><td>Phone number lock-in</td><td>Day 30</td><td>Senior number on Instagram bio, Google listing, menu cards. Changing it costs discoverability.</td></tr>
+    <tr><td>Call history + reservation log</td><td>Month 2</td><td>3 months of call data, FAQ analytics, reservation patterns. Ripping out Senior = losing business intelligence.</td></tr>
+    <tr><td>Training module (staff scoring)</td><td>Month 2</td><td>Same rubric grades Maya and human staff. Replacing Senior = losing 6+ months of staff evaluation data.</td></tr>
+  </table>
+</div>
+
+<!-- SECTION 13 -->
+<div class="section" id="s13">
+  <h2 class="sec-title">13. Risks &amp; Mitigations</h2>
+
+  <h3 class="sub-title">Technical Risks</h3>
+  <table>
+    <tr><th>ID</th><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+    <tr><td>T1</td><td>Zoronal STT degrades on heavy accent or noisy line → wrong slot filled</td><td><span class="badge high">High</span></td><td>Mandatory spell-back on name + last 4 digits on phone. If same field asked twice → escalate. Test on real PSTN Day 3.</td></tr>
+    <tr><td>T2</td><td>check_capacity tool call adds &gt;800ms → turn latency exceeds 3.5s</td><td><span class="badge high">High</span></td><td>Keep Edge Function lightweight (single Postgres query, no joins). Test call latency Day 3. If slow: move cap check to in-memory lookup.</td></tr>
+    <tr><td>T3</td><td>Maya hallucination — states fact not in knowledge card</td><td><span class="badge critical">Critical</span></td><td>Refusal rule is first instruction in prompt. Nightly 20 trap-question eval from Day 5. &gt;2% rate = kill criterion → prompt audit.</td></tr>
+    <tr><td>T4</td><td>Zoronal downtime → caller gets no answer</td><td><span class="badge medium">Medium</span></td><td>Plivo fallback message: "Technical issue, please call back in a few minutes." Owner PagerDuty-equivalent via Telegram alert on webhook silence &gt;60 min.</td></tr>
+    <tr><td>T5</td><td>Zoronal vendor risk — pricing change or platform shutdown</td><td><span class="badge high">High</span></td><td>Vendor portability rule enforced from Day 1. All data in Supabase. Migration to Pipecat = 2-week project. Get 12-month pricing locked in writing before customer #2.</td></tr>
+    <tr><td>T6</td><td>Supabase free tier pauses after 7 days of inactivity</td><td><span class="badge low">Low</span></td><td>Active testing and live calls prevent inactivity pause. If paused: manual unpause takes 30 seconds at supabase.com.</td></tr>
+  </table>
+
+  <h3 class="sub-title">UX Risks</h3>
+  <table>
+    <tr><th>ID</th><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+    <tr><td>U1</td><td>Customer realises AI and feels deceived</td><td><span class="badge high">High</span></td><td>DPDP recording notice at call open sets expectation. Maya is "AI concierge" — not pretending to be human. If asked directly: "I'm Maya, Blue Door's AI assistant."</td></tr>
+    <tr><td>U2</td><td>Weekend walk-in rule confuses or frustrates caller</td><td><span class="badge medium">Medium</span></td><td>Maya explains proactively and warmly: "We keep weekends before 1 PM for walk-ins so everyone gets a fair shot — it's usually only a 15-minute wait." Offer later slot if desired.</td></tr>
+    <tr><td>U3</td><td>Maya speaks too fast for older callers</td><td><span class="badge medium">Medium</span></td><td>Default TTS speed 0 or -1. Test with 5 non-tech callers in Week 1. Adjust voice speed parameter in Zoronal if needed.</td></tr>
+    <tr><td>U4</td><td>Caller asks about alcohol prices — Maya refuses, caller frustrated</td><td><span class="badge low">Low</span></td><td>Expected behaviour. Refusal is correct. Manager callback resolves. Not a product failure.</td></tr>
+  </table>
+
+  <h3 class="sub-title">Operational Risks</h3>
+  <table>
+    <tr><th>ID</th><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+    <tr><td>O1</td><td>Manager ignores Telegram notifications during service → customer shows up to unconfirmed booking</td><td><span class="badge critical">Critical</span></td><td>Auto-confirm SLA (30 min same-day, 4 hr future) prevents indefinite pending. If manager misses &gt;2 SLA windows in a week → founder calls owner directly with the data.</td></tr>
+    <tr><td>O2</td><td>Knowledge card goes stale → Maya quotes wrong hours or closed day</td><td><span class="badge high">High</span></td><td>WhatsApp update flow (v1). Weekly reminder to manager. Nightly automated check: does today match a closure? (v1 cron job)</td></tr>
+    <tr><td>O3</td><td>Wrong-restaurant routing if multiple restaurants onboarded carelessly</td><td><span class="badge critical">Critical</span></td><td>Each Plivo DID maps to exactly one Zoronal agent ID, exactly one restaurant row. Hardcoded. Automated routing test (call each DID, verify restaurant name in greeting) before every new restaurant deployment.</td></tr>
+    <tr><td>O4</td><td>Build delays push past Day 5 v0 target</td><td><span class="badge medium">Medium</span></td><td>v0 scope is deliberately minimal. If Day 3 build hits a wall: founder calls Zoronal founder for 1-hour technical walkthrough. Partnership means this support is available.</td></tr>
+  </table>
+</div>
+
+<!-- SECTION 14 -->
+<div class="section" id="s14">
+  <h2 class="sec-title">14. Future Roadmap</h2>
+
+  <h3 class="sub-title">v1.5 — Month 2 (Retention &amp; Scale)</h3>
+  <table>
+    <tr><th>Feature</th><th>Description</th><th>Why Now</th></tr>
+    <tr><td>Staff training module (scoring)</td><td>Same evaluation rubric scores human staff calls and Maya. Shared dashboard. One login shows AI vs human performance.</td><td>Primary retention lever. Churn protection. Makes replacing Senior costly.</td></tr>
+    <tr><td>Caller memory &amp; loyalty</td><td>Repeat callers identified by phone number. Previous visit notes surfaced to Maya. DPDP check required first.</td><td>Turns Senior into personalised concierge. Key differentiation.</td></tr>
+    <tr><td>Outbound reminders</td><td>Maya WhatsApps confirmed reservations 2 hours before. Reduces no-shows.</td><td>Direct revenue impact. Low build complexity once inbound stable.</td></tr>
+    <tr><td>Multi-restaurant onboarding</td><td>Self-serve knowledge card form. Founder no longer needs to manually provision each restaurant.</td><td>Required at customer #3+ to avoid founder bottleneck.</td></tr>
+    <tr><td>EazyDiner / Dineout read integration</td><td>Pull existing reservations into Senior's table. Manager has one unified view.</td><td>Required before approaching Stage 2 (chain) ICP.</td></tr>
+    <tr><td>Manual availability override</td><td>Manager can block specific slots via WhatsApp ("closed Sunday for private event").</td><td>Fills the gap between capacity-cap and real-time availability.</td></tr>
+  </table>
+
+  <h3 class="sub-title">v2 — Months 3–4 (Product Depth)</h3>
+  <table>
+    <tr><th>Feature</th><th>Description</th></tr>
+    <tr><td>Real-time table availability</td><td>Digital floor plan. Host-stand interface for staff. Turn-time prediction. Maya checks live availability before confirming.</td></tr>
+    <tr><td>Cross-product analytics</td><td>Maya vs human staff performance on same dashboard. Business intelligence layer.</td></tr>
+    <tr><td>AI-evaluating-AI</td><td>Senior's own calls scored by its evaluation engine. Surfaces Maya's mistakes as coaching triggers.</td></tr>
+  </table>
+
+  <h3 class="sub-title">v3 — Months 4+ (New Revenue Lines)</h3>
+  <table>
+    <tr><th>Feature</th><th>Description</th><th>Dependency</th></tr>
+    <tr><td>Voice ordering</td><td>Customer calls to pre-order for confirmed reservation. Captures items, modifiers, dietary restrictions.</td><td>POS integration (Petpooja/POSist). 3-month minimum build.</td></tr>
+    <tr><td>Outbound reservation campaigns</td><td>Maya calls lapsed customers. "Haven't seen you in a while — Mother's Day brunch this Sunday?"</td><td>Caller memory (v1.5). DPDP outbound consent. TRAI DND compliance.</td></tr>
+    <tr><td>White-label for chains</td><td>Chain operator manages all outlets from one account. Per-outlet analytics rolled up.</td><td>Multi-tenant architecture (v1.5 foundation).</td></tr>
+    <tr><td>Hospitality vertical expansion</td><td>Hotels, salons, clinics. Same voice OS, different knowledge card schema.</td><td>30+ restaurant case studies as proof before adjacent verticals.</td></tr>
+  </table>
+
+  <div class="callout green">
+    <div class="callout-label">Long-Term Vision</div>
+    <p>Senior as the Voice OS Layer for Indian Hospitality. In 36 months, Senior is not a voice bot for restaurants — it is the operating layer between a customer's phone call and any experience-driven SME in India. The moat is not the AI. It is the call data, the ops integration, and the trained rubrics that no competitor can replicate without 12 months of Indian restaurant calls.</p>
+  </div>
+</div>
+
+<!-- SECTION 15 -->
+<div class="section" id="s15">
+  <h2 class="sec-title">15. Build Plan</h2>
+
+  <h3 class="sub-title">v0 — Internal Test at TBDC (Days 1–5)</h3>
+  <div class="callout amber">
+    <div class="callout-label">Scope Boundary</div>
+    <p>v0 is for owner + manager internal testing ONLY. No real customers. No SMS. No WhatsApp. Goal: prove end-to-end flow works before going live. Done when: owner and manager can call the DID, Maya captures a reservation, Telegram fires, they confirm in Telegram, Supabase Studio shows the booking.</p>
+  </div>
+  <table>
+    <tr><th>Day</th><th>Milestone</th><th>Owner</th><th>Done When</th></tr>
+    <tr><td>1</td><td>Supabase setup: create project, run schema SQL, seed Blue Door restaurant row + knowledge card + capacity caps. Create Telegram bot via @BotFather. Get manager's Telegram chat ID.</td><td>Founder + Cursor</td><td>Supabase Studio shows restaurants, capacity_caps, and reservations tables. Telegram bot responds to /start.</td></tr>
+    <tr><td>2</td><td>Write Supabase Edge Functions: (1) check-capacity — reads capacity_caps table, returns available + alternate_slots. (2) zoronal-webhook — receives call-end payload, writes to calls + reservations, fires Telegram message with inline buttons.</td><td>Founder + Cursor</td><td>curl to check-capacity returns correct JSON. curl to zoronal-webhook creates a row in reservations and a Telegram message appears on manager's phone.</td></tr>
+    <tr><td>3</td><td>Configure Maya agent in Zoronal: paste system prompt (§9.3), register check_capacity tool (§9.4, pointing to Supabase Edge Function URL), configure post-call webhook (§9.5 URL + Bearer token), assign Plivo Indian DID.</td><td>Founder</td><td>Founder calls DID from personal phone. Maya answers within 1.5s. Speaks opening line correctly.</td></tr>
+    <tr><td>4</td><td>Run 20 internal test calls with owner + manager: reservation happy path, capacity full path, weekend walk-in rule, 5 FAQ types, 3 escalation types, 2 Hinglish sentences, 5 trap questions (facts not in knowledge card). Fix top 5 prompt failures.</td><td>Founder + Owner + Manager</td><td>Capture rate &gt;80% on test calls. Zero knowledge card hallucinations on trap questions. Telegram notifications arrive within 10s on all calls.</td></tr>
+    <tr><td>5</td><td>v0 decision gate review with owner + manager. Is the flow trustworthy? Can they see all bookings in Supabase Studio? Are they comfortable? If yes: proceed to v1. If no: fix identified issues and re-test on Day 6.</td><td>Founder</td><td>Owner says "yes, this works." Manager says "I'd actually use this." Proceed to v1 build.</td></tr>
+  </table>
+
+  <h3 class="sub-title">v1 — Blue Door Production Launch (Days 6–15)</h3>
+  <table>
+    <tr><th>Days</th><th>Milestone</th><th>Owner</th><th>Done When</th></tr>
+    <tr><td>6–7</td><td>Apply for Meta WhatsApp Business Account (takes 24–48 hrs). Set up MSG91 account. Begin building knowledge card update flow (manager texts change → LLM extracts → Supabase update + Zoronal API prompt update).</td><td>Founder</td><td>WhatsApp Business application submitted. MSG91 account created with credits loaded.</td></tr>
+    <tr><td>8–10</td><td>Once WhatsApp approved: build WhatsApp notification flow (replaces Telegram as primary). Add SMS confirmation to customer via MSG91. Test full production loop: call → capture → WhatsApp to manager → manager confirms → SMS to customer.</td><td>Founder + Cursor</td><td>Manager gets WhatsApp with inline buttons. Customer gets SMS within 30s of manager tap.</td></tr>
+    <tr><td>11–12</td><td>Add Blue Door Plivo DID to Instagram bio + Google My Business listing. Brief the Blue Door manager on what to expect when real customers call. Run 5 final joint test calls.</td><td>Founder + Manager</td><td>DID visible on Instagram. Manager comfortable with the flow. All 5 final tests pass.</td></tr>
+    <tr><td>13–15</td><td>Real customer traffic begins. Founder monitors every transcript daily in Zoronal dashboard. Manager monitors every booking in Supabase Studio + WhatsApp. Fix top 3 failures per day. Track reservation capture rate vs 80% target.</td><td>Founder + Manager</td><td>End of Day 15: reservation capture rate &gt;80% on real customer calls. Manager has not filed a single complaint about wrong data. Zero Maya hallucinations logged.</td></tr>
+    <tr><td>30</td><td>3-ring overflow on main Blue Door number: unanswered calls after 3 rings forward to Maya. Senior now handles 100% of inbound on both DID and main number.</td><td>Founder</td><td>Overflow forwarding live. Maya answers a test call forwarded from the main number correctly.</td></tr>
+    <tr><td>30–45</td><td>Founder approaches 3–5 Khan Market cafe owners with live Blue Door demo. Free 15-day trial offer. Target: 2 signed by Day 35, 5 by Day 50.</td><td>Founder</td><td>5 restaurants onboarded on Senior. Case study PDF published with Blue Door numbers.</td></tr>
+  </table>
+</div>
+
+</body>
+</html>
