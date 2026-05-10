@@ -1,9 +1,16 @@
 // zoronal-webhook — receives end-of-call payload from Zoronal.
 // Always sends Telegram (even for partial captures), so manager never misses a call.
+//
+// TODO(vendor-abstraction): when a second voice vendor lands, extract the post-parse
+// business logic below — calls upsert, upsertGuestFromCall, reservations insert,
+// Telegram notification — into _shared/handle-call-event.ts so both webhooks share it.
+// The seam is everything after `parseZoronalPayload(raw)` returns. See CLAUDE.md
+// "Voice Vendor Abstraction" for the principle.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { parseZoronalPayload } from "../_shared/parse-payload.ts";
 import { sendReservationNotification, sendPlainMessage } from "../_shared/telegram.ts";
+import { upsertGuestFromCall } from "../_shared/guests.ts";
 import { normalizePhone } from "../_shared/phone.ts";
 import { slaDeadline } from "../_shared/time.ts";
 
@@ -41,6 +48,7 @@ Deno.serve(async (req) => {
   // Idempotent calls upsert
   const callerE164 = normalizePhone(parsed.caller_number) ?? parsed.caller_number;
   const customerE164 = normalizePhone(parsed.customer_phone) ?? parsed.customer_phone;
+  const guestId = await upsertGuestFromCall(parsed);
   await sb.from("calls").upsert({
     id: parsed.call_id,
     restaurant_id: parsed.restaurant_id,
@@ -54,6 +62,7 @@ Deno.serve(async (req) => {
     transcript_url: parsed.transcript_url,
     audio_url: parsed.audio_url,
     raw_payload: raw,
+    guest_id: guestId,
   }, { onConflict: "id", ignoreDuplicates: true });
 
   // Look up restaurant chat_id
@@ -83,6 +92,7 @@ Deno.serve(async (req) => {
       booking_date: parsed.booking_date,
       booking_time: parsed.booking_time,
       special_requests: parsed.special_requests,
+      guest_id: guestId,
       direct_discount: parsed.direct_discount ?? false,
       sla_deadline: slaDeadline(parsed.booking_date!).toISOString(),
     }).select().single();

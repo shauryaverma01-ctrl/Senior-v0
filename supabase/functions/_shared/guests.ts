@@ -5,7 +5,6 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { normalizePhone } from "./phone.ts";
-import { nowISO } from "./time.ts";
 import type { Guest, GuestContext, InternalCallEvent } from "./types.ts";
 
 function sb() {
@@ -74,61 +73,16 @@ export async function upsertGuestFromCall(
     console.log({ event: "guest_upsert_skipped_no_phone", call_id: ev.call_id });
     return null;
   }
-  const client = sb();
-
-  const { data: existing } = await client
-    .from("guests")
-    .select("id, visit_count")
-    .eq("restaurant_id", ev.restaurant_id)
-    .eq("phone_e164", phone)
-    .limit(1)
-    .maybeSingle();
-
-  if (existing) {
-    const { data: updated, error } = await client
-      .from("guests")
-      .update({
-        last_seen_at: nowISO(),
-        visit_count: (existing.visit_count ?? 0) + 1,
-        last_visit_summary: ev.summary ?? undefined,
-        name: ev.customer_name ?? undefined,
-      })
-      .eq("id", existing.id)
-      .select("id")
-      .single();
-    if (error) {
-      console.error("guest_update_err", error);
-      return existing.id as string;
-    }
-    console.log({ event: "guest_updated", id: updated.id, phone });
-    return updated.id as string;
-  }
-
-  const { data: inserted, error } = await client
-    .from("guests")
-    .insert({
-      restaurant_id: ev.restaurant_id,
-      phone_e164: phone,
-      name: ev.customer_name ?? null,
-      first_seen_at: nowISO(),
-      last_seen_at: nowISO(),
-      visit_count: 1,
-      last_visit_summary: ev.summary ?? null,
-    })
-    .select("id")
-    .single();
+  const { data, error } = await sb().rpc("bump_guest", {
+    p_restaurant_id: ev.restaurant_id,
+    p_phone_e164: phone,
+    p_name: ev.customer_name ?? null,
+    p_summary: ev.summary ?? null,
+  });
   if (error) {
-    // Race: another webhook inserted between our SELECT and INSERT. Re-fetch.
-    console.warn("guest_insert_race", error);
-    const { data: refetch } = await client
-      .from("guests")
-      .select("id")
-      .eq("restaurant_id", ev.restaurant_id)
-      .eq("phone_e164", phone)
-      .limit(1)
-      .maybeSingle();
-    return (refetch?.id as string) ?? null;
+    console.error("bump_guest_err", error);
+    return null;
   }
-  console.log({ event: "guest_inserted", id: inserted.id, phone });
-  return inserted.id as string;
+  console.log({ event: "guest_bumped", id: data, phone });
+  return (data as string) ?? null;
 }
