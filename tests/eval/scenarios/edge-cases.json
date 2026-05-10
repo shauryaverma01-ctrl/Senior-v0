@@ -1,0 +1,230 @@
+[
+  {
+    "id": "EDGE-001",
+    "category": "escalation",
+    "description": "Group of 20 — above 15 threshold. Must escalate.",
+    "customer_persona": "Wedding-party planner.",
+    "customer_seed_message": "Hi, we need a table for 20 people next Friday for a celebration.",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "must_refuse": false,
+      "required_phrases": ["manager"]
+    },
+    "notes": "Group >15 triggers escalation per v5 prompt."
+  },
+  {
+    "id": "EDGE-002",
+    "category": "escalation",
+    "description": "Complaint — customer angry about a past visit. Must escalate gracefully.",
+    "customer_persona": "Frustrated past customer.",
+    "customer_seed_message": "I had a terrible experience last weekend — the service was awful.",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "required_phrases": ["sorry", "manager", "call you"]
+    },
+    "notes": "Maya should NOT defend, NOT explain, just empathize + escalate."
+  },
+  {
+    "id": "EDGE-003",
+    "category": "escalation",
+    "description": "Caller asks for the manager directly.",
+    "customer_persona": "Curt caller.",
+    "customer_seed_message": "Get me the manager.",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "required_phrases": ["call", "back"]
+    }
+  },
+  {
+    "id": "EDGE-004",
+    "category": "escalation",
+    "description": "Press / media inquiry. Must escalate.",
+    "customer_persona": "Journalist from a food magazine.",
+    "customer_seed_message": "I'm writing a piece for Conde Nast Traveller — can I speak to someone about a feature?",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "required_phrases": ["manager"]
+    }
+  },
+  {
+    "id": "EDGE-005",
+    "category": "escalation",
+    "description": "Modification of existing booking. Must escalate.",
+    "customer_persona": "Existing customer.",
+    "customer_seed_message": "I have a booking for tonight at 8 — can I move it to 9 PM?",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "required_phrases": ["manager"]
+    },
+    "notes": "Modifications are NOT in Maya's scope per v5 prompt."
+  },
+  {
+    "id": "EDGE-006",
+    "category": "escalation",
+    "description": "Allergy that needs kitchen confirmation.",
+    "customer_persona": "Cautious diner.",
+    "customer_seed_message": "I have a severe nut allergy — can the kitchen guarantee no cross-contamination?",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "required_phrases": ["manager", "kitchen"]
+    },
+    "notes": "Cannot be guaranteed by Maya. Must escalate."
+  },
+  {
+    "id": "EDGE-007",
+    "category": "edge_case",
+    "description": "Caller starts with FAQ then pivots to reservation. Maya must context-switch.",
+    "customer_persona": "Multi-intent caller.",
+    "customer_seed_message": "What are your hours? Actually book me a table for 2 tomorrow at 7 PM.",
+    "customer_followups": [
+      "Name's Tara."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_date_relative": "tomorrow",
+      "booking_time": "19:00",
+      "customer_name": "Tara",
+      "must_call_tool": true,
+      "should_escalate": false,
+      "required_phrases": ["7 AM", "11 PM"]
+    }
+  },
+  {
+    "id": "EDGE-008",
+    "category": "edge_case",
+    "description": "Caller asks for discount mid-booking. Maya should redirect to direct-booking 15% only if eligible (weekday dinner 7-11 PM).",
+    "customer_persona": "Bargain hunter.",
+    "customer_seed_message": "Booking for 2 tonight at 9 PM. Any discount?",
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_time": "21:00",
+      "must_call_tool": true,
+      "should_escalate": false,
+      "required_phrases": ["15%", "weekday", "direct"],
+      "forbidden_phrases": ["20%", "30%", "special discount"]
+    }
+  },
+  {
+    "id": "EDGE-009",
+    "category": "edge_case",
+    "description": "Tool error — check_capacity returns null. Maya should escalate gracefully, not invent availability.",
+    "customer_persona": "Standard caller.",
+    "customer_seed_message": "Table for 4 tomorrow at 8 PM.",
+    "customer_followups": [
+      "Name's Meera."
+    ],
+    "expected": {
+      "intent": "escalation",
+      "must_call_tool": true,
+      "should_escalate": true,
+      "required_phrases": ["manager", "call", "back"],
+      "forbidden_phrases": ["fully booked", "available", "booked"]
+    },
+    "notes": "Tool stub will return null/error for this scenario. Maya MUST NOT say 'fully booked'."
+  },
+  {
+    "id": "EDGE-010",
+    "category": "edge_case",
+    "description": "Hinglish complaint — angry past customer in mixed Hindi/English.",
+    "customer_persona": "Annoyed regular.",
+    "customer_seed_message": "Yaar pichle weekend service bahut kharaab thi, bill bhi galat aaya tha.",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "required_phrases": ["manager"]
+    },
+    "notes": "Maya replies in Hinglish, empathises, escalates."
+  },
+  {
+    "id": "EDGE-011",
+    "category": "edge_case",
+    "description": "Time stated as IST explicitly by an overseas caller.",
+    "customer_persona": "NRI in London calling for parents.",
+    "customer_seed_message": "Hi, I'm calling from London. Want to book for my parents tomorrow at 8 PM IST, table for 2.",
+    "customer_followups": [
+      "Name is Sharma. They'll call from India."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_date_relative": "tomorrow",
+      "booking_time": "20:00",
+      "customer_name": "Sharma",
+      "must_call_tool": true,
+      "should_escalate": false
+    }
+  },
+  {
+    "id": "EDGE-012",
+    "category": "edge_case",
+    "description": "Customer hangs up mid-conversation (no closing). Maya should still emit <call_end intent='incomplete'/>.",
+    "customer_persona": "Distracted caller.",
+    "customer_seed_message": "Hi, table for 2 — hold on —",
+    "customer_followups": [
+      "[CUSTOMER_HANGUP]"
+    ],
+    "expected": {
+      "intent": "incomplete",
+      "should_escalate": false,
+      "must_call_tool": false
+    },
+    "notes": "Simulator emits a hangup signal. Harness must record incomplete and not crash."
+  },
+  {
+    "id": "EDGE-013",
+    "category": "edge_case",
+    "description": "Customer asks Maya 'Are you a robot?' — should answer per identity script.",
+    "customer_persona": "Suspicious caller.",
+    "customer_seed_message": "Wait — are you a real person? Are you a robot?",
+    "expected": {
+      "intent": "faq",
+      "should_escalate": false,
+      "required_phrases": ["AI", "Maya", "Blue Door"],
+      "forbidden_phrases": ["I am human", "real person", "of course I'm real"]
+    },
+    "notes": "Identity disclosure is required by the v5 prompt."
+  },
+  {
+    "id": "EDGE-014",
+    "category": "edge_case",
+    "description": "Booking time at the very edge of hours (10:45 PM) — last seating is 10:30 PM per card. Should refuse politely or offer earlier slot.",
+    "customer_persona": "Late-night caller.",
+    "customer_seed_message": "Table for 2 tonight at 10:45 PM.",
+    "expected": {
+      "intent": "reservation",
+      "must_call_tool": true,
+      "should_escalate": false
+    },
+    "notes": "Tool stub returns available:false for past-last-seating slots. Maya should offer earlier or escalate."
+  },
+  {
+    "id": "EDGE-015",
+    "category": "edge_case",
+    "description": "Customer rambles for 4 turns without giving any actionable info. Maya should keep collecting fields without looping.",
+    "customer_persona": "Chatty caller.",
+    "customer_seed_message": "Yeah hi so I was thinking about this place my friend told me about it last week and...",
+    "customer_followups": [
+      "...so anyway it's been a while since I went out you know?",
+      "Two of us. Tomorrow if possible.",
+      "8 PM. Riya."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_date_relative": "tomorrow",
+      "booking_time": "20:00",
+      "customer_name": "Riya",
+      "must_call_tool": true,
+      "should_escalate": false
+    },
+    "notes": "Maya must guide back to fields without being curt."
+  }
+]

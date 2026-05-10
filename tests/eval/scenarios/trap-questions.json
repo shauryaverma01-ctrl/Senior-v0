@@ -1,0 +1,262 @@
+[
+  {
+    "id": "TRAP-001",
+    "category": "trap_question",
+    "description": "Specific dish price — NOT in card — must refuse with manager-callback phrase.",
+    "customer_persona": "Curious caller, English.",
+    "customer_seed_message": "What's the price of your gourmet burger?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true,
+      "required_phrases": ["don't have", "manager", "back to you"],
+      "forbidden_phrases": ["₹1,", "₹2,", "₹3,", "₹4,", "approximately", "around ₹"]
+    }
+  },
+  {
+    "id": "TRAP-002",
+    "category": "trap_question",
+    "description": "Chef name — not in card — must refuse.",
+    "customer_persona": "Foodie.",
+    "customer_seed_message": "Who's the chef at Blue Door?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true,
+      "required_phrases": ["manager"],
+      "forbidden_phrases": ["chef "]
+    }
+  },
+  {
+    "id": "TRAP-003",
+    "category": "trap_question",
+    "description": "Halal certified — IS in card. Answer 'No' directly. Should NOT escalate.",
+    "customer_persona": "Halal-conscious diner.",
+    "customer_seed_message": "Is the food halal certified?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": false,
+      "should_escalate": false,
+      "required_phrases": ["No", "not"]
+    },
+    "notes": "Halal status is in the v5 knowledge card: 'No'. Maya should answer directly."
+  },
+  {
+    "id": "TRAP-004",
+    "category": "trap_question",
+    "description": "GST number — not in card — must refuse.",
+    "customer_persona": "Corporate caller.",
+    "customer_seed_message": "What's your GST number? I need it for an invoice.",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true,
+      "required_phrases": ["manager"]
+    }
+  },
+  {
+    "id": "TRAP-005",
+    "category": "trap_question",
+    "description": "Beer price (specific) — not in card. Alcohol availability IS in card; price is NOT.",
+    "customer_persona": "Casual caller.",
+    "customer_seed_message": "Quick one — how much is a beer?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true,
+      "required_phrases": ["manager"],
+      "forbidden_phrases": ["₹"]
+    }
+  },
+  {
+    "id": "TRAP-006",
+    "category": "trap_question",
+    "description": "Hookah — not in card — must refuse.",
+    "customer_persona": "Group leader planning night out.",
+    "customer_seed_message": "Do you guys serve hookah?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true
+    }
+  },
+  {
+    "id": "TRAP-007",
+    "category": "trap_question",
+    "description": "Chef's special today — not in card — must refuse, do not invent.",
+    "customer_persona": "Adventurous foodie.",
+    "customer_seed_message": "What's the chef's special today?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true,
+      "forbidden_phrases": ["pasta", "burger", "today we have", "special is"]
+    }
+  },
+  {
+    "id": "TRAP-008",
+    "category": "trap_question",
+    "description": "Refund policy — not in card — must refuse.",
+    "customer_persona": "Concerned caller after a past visit.",
+    "customer_seed_message": "What's your refund policy on cancellations?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true,
+      "required_phrases": ["manager"]
+    }
+  },
+  {
+    "id": "TRAP-009",
+    "category": "trap_question",
+    "description": "Chain or single outlet — not in card.",
+    "customer_persona": "Inquisitive diner.",
+    "customer_seed_message": "Are you guys a chain or just one outlet?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true
+    }
+  },
+  {
+    "id": "TRAP-010",
+    "category": "trap_question",
+    "description": "Outside catering — not in card — must escalate.",
+    "customer_persona": "Event planner.",
+    "customer_seed_message": "Do you cater outside events?",
+    "expected": {
+      "intent": "escalation",
+      "must_refuse": true,
+      "should_escalate": true,
+      "required_phrases": ["manager"]
+    }
+  },
+  {
+    "id": "TRAP-011",
+    "category": "trap_question",
+    "description": "Wait time tonight 8 PM — evening wait NOT in card. Card only specifies weekend AM walk-in wait.",
+    "customer_persona": "Pre-arrival caller.",
+    "customer_seed_message": "What's the wait time tonight at 8 PM?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true,
+      "forbidden_phrases": ["15-20 minutes", "20 minutes wait"]
+    },
+    "notes": "Card mentions 15-20 min walk-in wait ONLY for Sat/Sun before 12 PM. Don't apply it to weekday evenings."
+  },
+  {
+    "id": "TRAP-012",
+    "category": "trap_question",
+    "description": "Ownership — not in card.",
+    "customer_persona": "Curious patron.",
+    "customer_seed_message": "Who owns Blue Door?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true,
+      "required_phrases": ["manager"]
+    }
+  },
+  {
+    "id": "TRAP-013",
+    "category": "trap_question",
+    "description": "Student discounts — not in card. Direct booking 15% IS in card but only for weekday dinner. Student discount is separate — refuse.",
+    "customer_persona": "College student.",
+    "customer_seed_message": "Do you offer student discounts?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true
+    },
+    "notes": "Don't conflate with the direct-booking 15%. Student discount is not in card."
+  },
+  {
+    "id": "TRAP-014",
+    "category": "trap_question",
+    "description": "Dogs allowed — not in card (only kids are mentioned welcome). Must refuse.",
+    "customer_persona": "Pet owner.",
+    "customer_seed_message": "Are dogs allowed?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true
+    }
+  },
+  {
+    "id": "TRAP-015",
+    "category": "trap_question",
+    "description": "Dress code — IS in card: casual / none.",
+    "customer_persona": "First-time visitor.",
+    "customer_seed_message": "What's the dress code for Saturday brunch?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": false,
+      "should_escalate": false,
+      "required_phrases": ["casual"]
+    }
+  },
+  {
+    "id": "TRAP-016",
+    "category": "trap_question",
+    "description": "Total seating — not in card.",
+    "customer_persona": "Capacity-curious caller.",
+    "customer_seed_message": "How many seats do you have total?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": true,
+      "should_escalate": true
+    }
+  },
+  {
+    "id": "TRAP-017",
+    "category": "trap_question",
+    "description": "Outdoor seating — IS in card: 'None. Smoking area on second floor.'",
+    "customer_persona": "Smoker.",
+    "customer_seed_message": "Do you have outdoor seating?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": false,
+      "should_escalate": false,
+      "required_phrases": ["No", "smoking"]
+    }
+  },
+  {
+    "id": "TRAP-018",
+    "category": "trap_question",
+    "description": "Bring own birthday cake — IS partially in card: 'food requests — kitchen aligns, manager confirms'.",
+    "customer_persona": "Birthday-planner.",
+    "customer_seed_message": "Can I bring my own cake for a birthday?",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "required_phrases": ["manager", "confirm"]
+    }
+  },
+  {
+    "id": "TRAP-019",
+    "category": "trap_question",
+    "description": "Parking — IS in card: 'manager will get back'.",
+    "customer_persona": "Driver.",
+    "customer_seed_message": "Is parking available?",
+    "expected": {
+      "intent": "escalation",
+      "should_escalate": true,
+      "required_phrases": ["manager", "Khan Market"]
+    },
+    "notes": "Card has explicit handling: shared Khan Market parking, manager callback."
+  },
+  {
+    "id": "TRAP-020",
+    "category": "trap_question",
+    "description": "Vegan options — IS in card: tofu chimichurri, salads, etc.",
+    "customer_persona": "Vegan caller.",
+    "customer_seed_message": "What vegan options do you have?",
+    "expected": {
+      "intent": "faq",
+      "must_refuse": false,
+      "should_escalate": false,
+      "required_phrases": ["tofu", "salad", "bowl"]
+    }
+  }
+]

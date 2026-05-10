@@ -1,0 +1,276 @@
+[
+  {
+    "id": "RESV-001",
+    "category": "reservation_basic",
+    "description": "Simple table-for-2 booking, weekday evening",
+    "customer_persona": "Delhi professional, mid-30s, English speaker, polite and brief.",
+    "customer_seed_message": "Hi, can I book a table for 2 tonight at 8 PM?",
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_date_relative": "today",
+      "booking_time": "20:00",
+      "customer_name": "any",
+      "must_call_tool": true,
+      "should_escalate": false
+    }
+  },
+  {
+    "id": "RESV-002",
+    "category": "reservation_basic",
+    "description": "Booking for tomorrow, dinner. Customer gives info gradually.",
+    "customer_persona": "South Delhi mom, 40s, English with mild Indian cadence, friendly.",
+    "customer_seed_message": "Hello, I'd like to make a reservation please.",
+    "customer_followups": [
+      "It's for tomorrow.",
+      "Around 7:30 PM.",
+      "We'll be 4 of us.",
+      "Name is Priya. Number is 9810045500."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 4,
+      "booking_date_relative": "tomorrow",
+      "booking_time": "19:30",
+      "customer_name": "Priya",
+      "must_call_tool": true,
+      "should_escalate": false
+    }
+  },
+  {
+    "id": "RESV-003",
+    "category": "reservation_basic",
+    "description": "Hinglish caller — mixed Hindi/English. Maya should match the mix.",
+    "customer_persona": "Delhi guy, 28, Hinglish-native, casual.",
+    "customer_seed_message": "Bhai, kal raat 9 baje table chahiye, 4 log.",
+    "expected": {
+      "intent": "reservation",
+      "party_size": 4,
+      "booking_date_relative": "tomorrow",
+      "booking_time": "21:00",
+      "customer_name": "any",
+      "must_call_tool": true,
+      "should_escalate": false
+    },
+    "notes": "Maya's reply should be Hinglish, not pure Hindi or pure English."
+  },
+  {
+    "id": "RESV-004",
+    "category": "reservation_ambiguous",
+    "description": "Caller says 'this Saturday' — must resolve to correct IST date using prompt anchor.",
+    "customer_persona": "Working professional, 30s, English speaker.",
+    "customer_seed_message": "Table for 3 this Saturday around 8?",
+    "customer_followups": [
+      "8 PM, evening.",
+      "Name's Arjun, ending 4421."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 3,
+      "booking_date_relative": "this_saturday",
+      "booking_time": "20:00",
+      "customer_name": "Arjun",
+      "must_call_tool": true,
+      "should_escalate": false
+    }
+  },
+  {
+    "id": "RESV-005",
+    "category": "reservation_ambiguous",
+    "description": "Time stated as '8' — ambiguous AM/PM. Maya must clarify exactly once.",
+    "customer_persona": "Older customer, 60s, slightly hard of hearing, polite.",
+    "customer_seed_message": "I want to book for 4 people tomorrow at 8.",
+    "expected": {
+      "intent": "reservation",
+      "party_size": 4,
+      "booking_date_relative": "tomorrow",
+      "must_call_tool": true,
+      "should_escalate": false,
+      "required_phrases": ["AM or PM", "morning or evening", "evening?"]
+    },
+    "notes": "Maya should ask AM/PM exactly once, not loop on it."
+  },
+  {
+    "id": "RESV-006",
+    "category": "reservation_basic",
+    "description": "Caller wants weekday dinner — Maya should mention 15% direct-line discount.",
+    "customer_persona": "Cost-conscious customer, 30s, English speaker.",
+    "customer_seed_message": "I'd like to book a table for 2 this Tuesday at 8:30 PM.",
+    "customer_followups": [
+      "Yeah, dinner. Name is Karan."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_time": "20:30",
+      "customer_name": "Karan",
+      "must_call_tool": true,
+      "should_escalate": false,
+      "required_phrases": ["15%", "discount", "direct"]
+    }
+  },
+  {
+    "id": "RESV-007",
+    "category": "reservation_group",
+    "description": "Party size 12 — within the 15-cap limit. Should be handled normally, not escalated.",
+    "customer_persona": "Office team lead, 30s, English speaker.",
+    "customer_seed_message": "Hi, I'd like to book for 12 people on Saturday evening.",
+    "customer_followups": [
+      "8 PM works.",
+      "It's a team dinner. Name's Ravi."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 12,
+      "booking_date_relative": "saturday",
+      "booking_time": "20:00",
+      "customer_name": "Ravi",
+      "must_call_tool": true,
+      "should_escalate": false
+    },
+    "notes": "Trap: don't escalate prematurely. 12 is under the 15+ threshold per v5 prompt."
+  },
+  {
+    "id": "RESV-008",
+    "category": "reservation_basic",
+    "description": "Lunch booking, weekday.",
+    "customer_persona": "Business lunch coordinator, English.",
+    "customer_seed_message": "Need a table for 6 tomorrow at 1 PM.",
+    "customer_followups": [
+      "Aditi. 9810099887."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 6,
+      "booking_date_relative": "tomorrow",
+      "booking_time": "13:00",
+      "customer_name": "Aditi",
+      "must_call_tool": true,
+      "should_escalate": false
+    }
+  },
+  {
+    "id": "RESV-009",
+    "category": "reservation_basic",
+    "description": "Couple booking with special request (window seat). Maya should capture, not invent.",
+    "customer_persona": "Anniversary couple, 40s.",
+    "customer_seed_message": "Booking for 2 tomorrow at 7:30 PM. Can we get a window seat?",
+    "customer_followups": [
+      "Vikram. Yes that's fine."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_time": "19:30",
+      "customer_name": "Vikram",
+      "must_call_tool": true,
+      "should_escalate": false
+    },
+    "notes": "Maya should capture 'window seat' as special_requests. Not promise it specifically."
+  },
+  {
+    "id": "RESV-010",
+    "category": "reservation_unavailable",
+    "description": "Capacity full — tool returns alternates. Maya should offer the closest alternate.",
+    "customer_persona": "Friday-night caller, 30s.",
+    "customer_seed_message": "Table for 4 tonight at 9 PM please.",
+    "customer_followups": [
+      "Sure, what's available?",
+      "Yes 8 PM works. Name's Neha."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 4,
+      "must_call_tool": true,
+      "should_escalate": false,
+      "required_phrases": ["alternate", "instead", "would"]
+    },
+    "notes": "Tool stub will return available:false with alternate_slots:['20:00','21:30']."
+  },
+  {
+    "id": "RESV-011",
+    "category": "reservation_unavailable",
+    "description": "Saturday morning before 1 PM — walk-in only per knowledge card.",
+    "customer_persona": "Brunch caller.",
+    "customer_seed_message": "Can I book for Saturday at 11 AM?",
+    "expected": {
+      "intent": "reservation",
+      "must_call_tool": true,
+      "should_escalate": false,
+      "required_phrases": ["walk-in", "after 1", "wait"]
+    },
+    "notes": "Tool stub returns available:false, reason:'weekend_walk_in_only'."
+  },
+  {
+    "id": "RESV-012",
+    "category": "reservation_basic",
+    "description": "Caller says 'tonight' — must use prompt's date anchor (Friday 8 May 2026 → 2026-05-08).",
+    "customer_persona": "Last-minute caller.",
+    "customer_seed_message": "Got a table tonight at 9? Just 2 of us.",
+    "customer_followups": [
+      "Sandeep, 9999000011."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_date_relative": "today",
+      "booking_time": "21:00",
+      "customer_name": "Sandeep",
+      "must_call_tool": true,
+      "should_escalate": false
+    }
+  },
+  {
+    "id": "RESV-013",
+    "category": "reservation_basic",
+    "description": "Solo diner, lunch.",
+    "customer_persona": "Single professional.",
+    "customer_seed_message": "Just for me, lunch tomorrow around 1.",
+    "expected": {
+      "intent": "reservation",
+      "party_size": 1,
+      "booking_date_relative": "tomorrow",
+      "booking_time": "13:00",
+      "customer_name": "any",
+      "must_call_tool": true,
+      "should_escalate": false
+    }
+  },
+  {
+    "id": "RESV-014",
+    "category": "reservation_basic",
+    "description": "Caller gives all info upfront in a single sentence.",
+    "customer_persona": "Efficient caller, English, in a hurry.",
+    "customer_seed_message": "Hi, Rohan here, 9876543210, table for 4 tomorrow 8 PM, no special requests.",
+    "expected": {
+      "intent": "reservation",
+      "party_size": 4,
+      "booking_date_relative": "tomorrow",
+      "booking_time": "20:00",
+      "customer_name": "Rohan",
+      "must_call_tool": true,
+      "should_escalate": false
+    },
+    "notes": "Maya should NOT re-ask any field. Move directly to tool call after confirming key fields."
+  },
+  {
+    "id": "RESV-015",
+    "category": "reservation_basic",
+    "description": "Caller mentions average price expectation. Maya can confirm '₹2,000-2,500 for two' (in card).",
+    "customer_persona": "Date-night caller asking about budget.",
+    "customer_seed_message": "Booking for 2 tonight at 8. Quick — what's roughly the average bill?",
+    "customer_followups": [
+      "Cool, that works. Name's Aman."
+    ],
+    "expected": {
+      "intent": "reservation",
+      "party_size": 2,
+      "booking_time": "20:00",
+      "customer_name": "Aman",
+      "must_call_tool": true,
+      "should_escalate": false,
+      "required_phrases": ["2,000", "2,500"]
+    },
+    "notes": "Average price IS in the card. Maya can answer that, not specific dish prices."
+  }
+]

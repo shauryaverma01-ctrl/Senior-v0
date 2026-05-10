@@ -48,3 +48,9 @@ export function slaDeadline(bookingDate: string): Date {
   const ms = isSameDay ? 30 * 60 * 1000 : 4 * 60 * 60 * 1000;
   return new Date(Date.now() + ms);
 }
+
+// Current UTC time as ISO 8601 string. Use for timestamptz writes.
+// All `new Date()` usage stays in this file per CLAUDE.md rule 3.
+export function nowISO(): string {
+  return new Date().toISOString();
+}

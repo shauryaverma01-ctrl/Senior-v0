@@ -1,0 +1,2564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senior — V0 strategy document</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #f3f1ea;
+  --border: #e5e3dc;
+  --border-strong: #d3d1c7;
+  --text: #1a1a17;
+  --text-2: #5f5e5a;
+  --text-3: #888780;
+  --accent: #534AB7;
+  --accent-bg: #EEEDFE;
+  --accent-border: #CECBF6;
+  --accent-text: #3C3489;
+  --teal: #0F6E56;
+  --teal-bg: #E1F5EE;
+  --teal-border: #9FE1CB;
+  --teal-text: #085041;
+  --amber-bg: #FAEEDA;
+  --amber-text: #633806;
+  --amber-border: #FAC775;
+  --red-bg: #FCEBEB;
+  --red-text: #791F1F;
+  --red-border: #F7C1C1;
+  --blue-bg: #E6F1FB;
+  --blue-text: #0C447C;
+  --blue-border: #B5D4F4;
+  --gray-bg: #F1EFE8;
+  --gray-text: #444441;
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", Baskerville, serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a17;
+    --surface: #232320;
+    --surface-2: #2c2c28;
+    --border: #3a3a35;
+    --border-strong: #4a4a44;
+    --text: #f0eee6;
+    --text-2: #b4b2a9;
+    --text-3: #888780;
+    --accent: #AFA9EC;
+    --accent-bg: #26215C;
+    --accent-border: #534AB7;
+    --accent-text: #CECBF6;
+    --teal: #5DCAA5;
+    --teal-bg: #04342C;
+    --teal-border: #0F6E56;
+    --teal-text: #9FE1CB;
+    --amber-bg: #412402;
+    --amber-text: #FAC775;
+    --amber-border: #854F0B;
+    --red-bg: #501313;
+    --red-text: #F09595;
+    --red-border: #A32D2D;
+    --blue-bg: #042C53;
+    --blue-text: #85B7EB;
+    --blue-border: #185FA5;
+    --gray-bg: #2C2C2A;
+    --gray-text: #B4B2A9;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+
+.page-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 22px 36px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: saturate(180%) blur(8px);
+}
+.page-header h1 {
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.page-header p {
+  font-size: 13px;
+  color: var(--text-2);
+  margin: 2px 0 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  max-width: 1280px;
+  margin: 0 auto;
+  gap: 0;
+}
+
+.sidebar {
+  position: sticky;
+  top: 78px;
+  align-self: start;
+  height: calc(100vh - 78px);
+  overflow-y: auto;
+  padding: 28px 20px 28px 36px;
+  border-right: 1px solid var(--border);
+  font-size: 13px;
+}
+.sidebar-h {
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+.sidebar ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: navi;
+}
+.sidebar li { counter-increment: navi; margin: 0; }
+.sidebar a {
+  display: block;
+  padding: 6px 10px 6px 32px;
+  color: var(--text-2);
+  text-decoration: none;
+  border-radius: 6px;
+  position: relative;
+  line-height: 1.4;
+  transition: background 0.1s, color 0.1s;
+}
+.sidebar a::before {
+  content: counter(navi, decimal-leading-zero);
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  font-size: 11px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.sidebar a:hover { background: var(--surface-2); color: var(--text); }
+.sidebar a.active { background: var(--accent-bg); color: var(--accent-text); }
+.sidebar a.active::before { color: var(--accent-text); }
+
+.content {
+  padding: 28px 56px 120px 56px;
+  max-width: 820px;
+}
+
+.sec {
+  padding: 36px 0;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 24px;
+}
+.sec:first-of-type { border-top: none; padding-top: 12px; }
+.eyebrow {
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+h2.h1 {
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 0 0 14px 0;
+  letter-spacing: -0.015em;
+}
+h2.h2 {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.01em;
+}
+h3 {
+  font-size: 17px;
+  font-weight: 500;
+  margin: 28px 0 8px 0;
+  letter-spacing: -0.005em;
+}
+p { margin: 0 0 12px 0; }
+.lead {
+  font-size: 17px;
+  color: var(--text-2);
+  line-height: 1.65;
+  margin: 0 0 16px 0;
+}
+.body { font-size: 16px; line-height: 1.7; margin: 0 0 14px 0; }
+.body-mute { font-size: 15px; color: var(--text-2); line-height: 1.65; margin: 0 0 12px 0; }
+
+.row { display: grid; gap: 14px; margin: 16px 0; }
+.r2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.r3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.r4 { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.card h4 { font-size: 15px; font-weight: 500; margin: 0 0 8px 0; }
+.card p { font-size: 14px; color: var(--text-2); line-height: 1.6; margin: 0; }
+
+.metric {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.mn { font-size: 26px; font-weight: 500; margin: 0 0 4px 0; line-height: 1.1; letter-spacing: -0.015em; }
+.ml { font-size: 13px; color: var(--text-2); margin: 0; line-height: 1.5; }
+
+.pillar-purple { background: var(--accent-bg); border-color: var(--accent-border); }
+.pillar-purple h4 { color: var(--accent-text); }
+.pillar-purple p { color: var(--accent); }
+.pillar-teal { background: var(--teal-bg); border-color: var(--teal-border); }
+.pillar-teal h4 { color: var(--teal-text); }
+.pillar-teal p { color: var(--teal); }
+
+.callout {
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 16px 22px;
+  margin: 18px 0;
+}
+.callout-q {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0;
+  font-style: italic;
+}
+
+.matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+@media (max-width: 700px) { .matrix { grid-template-columns: 1fr; } }
+.q-card {
+  border-radius: 12px;
+  padding: 16px 18px;
+  border: 1px solid;
+}
+.q-1 { background: var(--teal-bg); border-color: var(--teal-border); }
+.q-1 h4 { color: var(--teal-text); }
+.q-1 li { color: var(--teal-text); }
+.q-2 { background: var(--blue-bg); border-color: var(--blue-border); }
+.q-2 h4 { color: var(--blue-text); }
+.q-2 li { color: var(--blue-text); }
+.q-3 { background: var(--amber-bg); border-color: var(--amber-border); }
+.q-3 h4 { color: var(--amber-text); }
+.q-3 li { color: var(--amber-text); }
+.q-4 { background: var(--red-bg); border-color: var(--red-border); }
+.q-4 h4 { color: var(--red-text); }
+.q-4 li { color: var(--red-text); }
+.q-card h4 { font-size: 13px; font-weight: 500; margin: 0 0 10px 0; letter-spacing: 0.04em; }
+.q-card ul { list-style: none; padding: 0; margin: 0; }
+.q-card li { font-size: 13px; line-height: 1.55; padding: 3px 0; }
+
+.feat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.feat[open] { border-color: var(--border-strong); }
+.feat summary {
+  padding: 14px 18px;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  user-select: none;
+}
+.feat summary::-webkit-details-marker { display: none; }
+.feat summary::before {
+  content: "›";
+  font-size: 16px;
+  color: var(--text-3);
+  transition: transform 0.15s;
+  display: inline-block;
+  width: 12px;
+}
+.feat[open] summary::before { transform: rotate(90deg); }
+.feat-num {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: var(--surface-2);
+  padding: 3px 9px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  min-width: 28px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.feat-name { font-size: 15px; font-weight: 500; margin: 0; flex: 1; min-width: 200px; }
+.feat-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+.badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.b-v0 { background: var(--teal-bg); color: var(--teal-text); }
+.b-fake { background: var(--amber-bg); color: var(--amber-text); }
+.b-cut { background: var(--red-bg); color: var(--red-text); }
+.b-v1 { background: var(--gray-bg); color: var(--gray-text); }
+.b-replaced { background: var(--accent-bg); color: var(--accent-text); }
+.b-num { background: var(--surface-2); color: var(--text-2); }
+.feat-body { padding: 0 18px 18px 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+.feat-row { margin: 10px 0; }
+.feat-label {
+  display: block;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.1em;
+  margin-bottom: 3px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+.feat-text { font-size: 14px; line-height: 1.6; color: var(--text); margin: 0; }
+.feat-text-mute { font-size: 14px; line-height: 1.6; color: var(--text-2); margin: 0; }
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+.feat-grid .gcell p { font-size: 13px; line-height: 1.55; color: var(--text); margin: 0; }
+.feat-verdict {
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+.fv-yes { background: var(--teal-bg); color: var(--teal-text); }
+.fv-fake { background: var(--amber-bg); color: var(--amber-text); }
+.fv-no { background: var(--gray-bg); color: var(--gray-text); }
+
+.list { list-style: none; padding: 0; margin: 14px 0; }
+.list li {
+  font-size: 15px;
+  line-height: 1.65;
+  padding: 8px 0;
+  padding-left: 24px;
+  position: relative;
+  color: var(--text);
+}
+.list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  color: var(--text-3);
+}
+.list-tight li { font-size: 14px; padding: 5px 0 5px 24px; }
+.list b { font-weight: 500; }
+
+.ck-list { list-style: none; padding: 0; margin: 14px 0; counter-reset: ck; }
+.ck-list li {
+  counter-increment: ck;
+  font-size: 15px;
+  line-height: 1.6;
+  padding: 12px 0 12px 40px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+.ck-list li:last-child { border-bottom: none; }
+.ck-list li::before {
+  content: counter(ck);
+  position: absolute;
+  left: 0;
+  top: 12px;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin: 14px 0;
+}
+th {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-strong);
+}
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.55;
+  color: var(--text);
+}
+tr:last-child td { border-bottom: none; }
+
+.flow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 18px 0;
+}
+@media (max-width: 600px) { .flow { grid-template-columns: repeat(2, 1fr); } }
+.step {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 14px 8px;
+  text-align: center;
+}
+.step-icon {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 8px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  font-size: 18px;
+  font-weight: 500;
+}
+.step-l { font-size: 13px; color: var(--text); margin: 0; line-height: 1.3; font-weight: 500; }
+
+.tl {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 0;
+  margin: 14px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.tl-day {
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+.tl-task {
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.55;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  background: var(--surface);
+}
+.tl-day:last-of-type, .tl-task:last-of-type { border-bottom: none; }
+
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  margin-right: 6px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+.tag-them { background: var(--surface-2); color: var(--text-2); }
+.tag-us { background: var(--blue-bg); color: var(--blue-text); }
+.tag-warn { background: var(--amber-bg); color: var(--amber-text); }
+.tag-good { background: var(--teal-bg); color: var(--teal-text); }
+
+.demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.demo-num {
+  font-size: 10px;
+  color: var(--text-3);
+  margin: 0 0 6px 0;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+.demo h4 { font-size: 15px; font-weight: 500; margin: 0 0 8px 0; }
+.demo p { font-size: 14px; color: var(--text-2); margin: 0; line-height: 1.55; }
+.demo q { font-family: var(--font-serif); font-style: italic; }
+.demo-pick { border: 2px solid var(--blue-text); }
+.demo-pick-badge {
+  display: inline-block;
+  background: var(--blue-bg);
+  color: var(--blue-text);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 6px 0;
+  flex-wrap: wrap;
+}
+.btn {
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+.btn:hover { background: var(--surface-2); }
+
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .content { padding: 24px 24px 80px 24px; max-width: 100%; }
+}
+
+@media print {
+  .page-header, .sidebar, .controls { display: none !important; }
+  .layout { grid-template-columns: 1fr; }
+  .content { padding: 0; max-width: 100%; }
+  .feat[open] { page-break-inside: avoid; }
+  .feat:not([open]) summary::before { display: none; }
+  details summary { cursor: default; }
+  details:not([open]) > *:not(summary) { display: none; }
+  body { background: white; color: black; font-size: 11pt; }
+  .sec { page-break-inside: avoid; }
+  h2.h1, h2.h2, h3 { page-break-after: avoid; }
+  .uflow { page-break-inside: avoid; }
+}
+
+.uflow {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.uflow-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.uflow-num {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent-text);
+  background: var(--accent-bg);
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+.uflow-head h4 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  flex: 1;
+  min-width: 220px;
+}
+.uflow-meta {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
+}
+.uflow-trigger {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-left: 3px solid var(--accent);
+}
+.uflow-trigger p {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.5;
+}
+.uflow-trigger .feat-label { display: block; margin-bottom: 3px; }
+.uflow-steps {
+  list-style: none;
+  padding: 0 0 0 20px;
+  margin: 0 0 14px 0;
+  counter-reset: ufs;
+  border-left: 2px solid var(--border);
+  position: relative;
+}
+.uflow-steps li {
+  counter-increment: ufs;
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 8px 0;
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.uflow-steps li::before {
+  content: counter(ufs);
+  position: absolute;
+  left: -29px;
+  top: 9px;
+  font-size: 10px;
+  background: var(--surface);
+  color: var(--text-3);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+.actor {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+.a-caller { background: var(--gray-bg); color: var(--gray-text); }
+.a-plivo { background: var(--red-bg); color: var(--red-text); }
+.a-zoronal { background: var(--accent-bg); color: var(--accent-text); }
+.a-fn { background: var(--teal-bg); color: var(--teal-text); }
+.a-pg { background: var(--blue-bg); color: var(--blue-text); }
+.a-tg { background: var(--amber-bg); color: var(--amber-text); }
+.a-sms { background: var(--red-bg); color: var(--red-text); }
+.a-mgr { background: var(--gray-bg); color: var(--gray-text); }
+.a-kit { background: var(--gray-bg); color: var(--gray-text); }
+.a-cron { background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); }
+.step-text {
+  flex: 1;
+  min-width: 220px;
+  color: var(--text);
+}
+.step-text code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--text);
+}
+.lat {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3);
+  background: var(--surface-2);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.uflow-asides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.uflow-aside {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.uflow-aside .feat-label { display: block; margin-bottom: 4px; }
+.uflow-aside p {
+  font-size: 12px;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.55;
+}
+.uflow-aside ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.uflow-aside li {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.5;
+  padding: 3px 0 3px 12px;
+  position: relative;
+}
+.uflow-aside li::before {
+  content: "·";
+  position: absolute;
+  left: 2px;
+  color: var(--text-3);
+}
+.actor-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0 22px 0;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  align-items: center;
+}
+.actor-legend .actor { margin-top: 0; }
+.legend-h {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 500;
+  margin-right: 8px;
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>Senior — V0 strategy document</h1>
+  <p>Investor review · May 21, 2026 · The Blue Door Cafe, Khan Market</p>
+</header>
+
+<div class="layout">
+
+<nav class="sidebar" aria-label="Section navigation">
+  <p class="sidebar-h">Twenty-one sections</p>
+  <ol>
+    <li><a href="#s1">Reframe</a></li>
+    <li><a href="#s2">Investor story</a></li>
+    <li><a href="#s3">Two pillars</a></li>
+    <li><a href="#s4">Restaurant Brain</a></li>
+    <li><a href="#s5">Feature matrix</a></li>
+    <li><a href="#s6">Twenty-eight features</a></li>
+    <li><a href="#s7">V0 scope</a></li>
+    <li><a href="#s8">What to fake</a></li>
+    <li><a href="#s9">What impresses</a></li>
+    <li><a href="#s10">Demo moments</a></li>
+    <li><a href="#s11">Positioning</a></li>
+    <li><a href="#s12">Not Bland or Vapi</a></li>
+    <li><a href="#s13">Defensibility</a></li>
+    <li><a href="#s14">CTO reality</a></li>
+    <li><a href="#s15">Rule vs prompt vs LLM</a></li>
+    <li><a href="#s16">Eleven-day plan</a></li>
+    <li><a href="#s17">V0 stack</a></li>
+    <li><a href="#s18">What compounds</a></li>
+    <li><a href="#s19">Closing concerns</a></li>
+    <li><a href="#s20">Tomorrow morning</a></li>
+    <li><a href="#s21">User flows (CTO)</a></li>
+  </ol>
+</nav>
+
+<main class="content">
+
+<section class="sec" id="s1">
+  <p class="eyebrow">Section 01 — the reframe</p>
+  <h2 class="h1">You are not building a voice agent. You are building the guest data layer for Indian hospitality, with the phone call as the wedge.</h2>
+  <p class="body">Every other framing — AI hostess, AI maître d', front-of-house OS — is marketing skin over that one structural truth. If a partner walks out of May 21 remembering one thing, it should be: Senior owns the inbound call → Senior owns the guest profile → Senior becomes the CRM, the loyalty engine, and eventually the revenue layer. The voice agent is the trojan horse. The guest graph is the product.</p>
+  <p class="body">"Another voice AI for restaurants" is a category with eight funded teams in India and forty globally. "The guest operating system for Indian F&amp;B, distributed via voice" is a category of one — and the moat compounds the moment you have a single restaurant's six-month call history sitting in your Postgres.</p>
+  <div class="callout">
+    <p class="callout-q">It anchors on a role (front-of-house), not a technology (voice AI). The upgrade path from "we answer your calls" to "we are your CRM, your loyalty stack, and your demand engine" is already baked in. Every later product is a natural extension, not a pivot.</p>
+  </div>
+</section>
+
+<section class="sec" id="s2">
+  <p class="eyebrow">Section 02 — the investor story in three sentences</p>
+  <h2 class="h2">Three sentences, in this order.</h2>
+  <div class="row r3">
+    <div class="card pillar-purple">
+      <h4>The wedge</h4>
+      <p>Indian restaurants miss 30–40% of their calls; the ones they answer are taken by frontline staff with 60% annual churn, no memory of the caller, and zero ability to upsell. We replace that layer.</p>
+    </div>
+    <div class="card pillar-purple">
+      <h4>The structural insight</h4>
+      <p>In the US, OpenTable owns the guest. In India, the phone owns the guest — there is no installed reservation graph. Whoever sits on the call captures the guest record by default, and the phone number is the universal key.</p>
+    </div>
+    <div class="card pillar-purple">
+      <h4>The compounding asset</h4>
+      <p>Every call we handle adds a row to a guest table that didn't exist before. Within twelve months, a typical Senior restaurant has 3,000–8,000 structured guest profiles — preferences, allergies, occasions, visit cadence. Impossible to reconstruct if they churn.</p>
+    </div>
+  </div>
+  <p class="body-mute">The QA / mystery-shopping / DeepCall narrative does not lead. It is slide eleven, not slide three. Putting it earlier dilutes the core reframe — investors will pattern-match you to "voice eval startup" and you will lose the vertical-SaaS multiple.</p>
+</section>
+
+<section class="sec" id="s3">
+  <p class="eyebrow">Section 03 — the two pillars</p>
+  <h2 class="h2">Built on two structured memories. Both compound. Both proprietary per restaurant.</h2>
+  <p class="lead">The Guest Graph is the structured memory of who walks in. The Restaurant Brain is the structured memory of what they walk into. One without the other is half a product.</p>
+  <div class="row r2">
+    <div class="card pillar-purple">
+      <h4>Guest Graph — who comes here</h4>
+      <p>Phone-keyed profile of every caller. Fields: name, phone_e164, first_seen_at, last_seen_at, visit_count, tier (new / regular / vip), preferences, allergens, occasions (birthday, anniversary), notes, last_visit_summary, risk_flags. One row per guest, growing every call. Compounds via every call.</p>
+    </div>
+    <div class="card pillar-teal">
+      <h4>Restaurant Brain — what they walk into</h4>
+      <p>Structured menu ontology (dishes, ingredients, allergens, dietary tags, pairings, live availability) plus FAQ corpus (categorized, versioned) plus live kitchen state. The agent reasons over it during a call. Compounds via kitchen updates and FAQ-gap closure.</p>
+    </div>
+  </div>
+  <h3>What happens on a call</h3>
+  <div class="flow">
+    <div class="step"><div class="step-icon">→</div><p class="step-l">Inbound</p></div>
+    <div class="step"><div class="step-icon">✓</div><p class="step-l">Recognized</p></div>
+    <div class="step"><div class="step-icon">◆</div><p class="step-l">Reasoned</p></div>
+    <div class="step"><div class="step-icon">▤</div><p class="step-l">Captured</p></div>
+    <div class="step"><div class="step-icon">↗</div><p class="step-l">Manager</p></div>
+  </div>
+  <p class="body-mute">Caller dials → E.164 number → guest profile lookup → context injected into prompt → personalized handling → updated profile → kitchen + menu state queried → manager notified. The single highest-leverage code change before May 21 is creating the guests table keyed on E.164. Everything in section 06 is downstream of that one migration.</p>
+</section>
+
+<section class="sec" id="s4">
+  <p class="eyebrow">Section 04 — the restaurant brain in detail</p>
+  <h2 class="h2">Three layers, independently shippable, no new infrastructure.</h2>
+  <div class="row r3">
+    <div class="card">
+      <h4>Layer 1 — Menu Graph</h4>
+      <p>Relational ontology in Supabase. Tables: dishes, dish_tags, dish_allergens, dish_pairings. SQL filters at sub-50ms over 40 dishes. No pgvector for V0 — overkill at this scale, deterministic and debuggable matters more.</p>
+    </div>
+    <div class="card">
+      <h4>Layer 2 — FAQ corpus</h4>
+      <p>Categorized FAQ items with question_canonical, aliases, answer, expires_at. faq_gaps table captures every "let me check on that" — the self-improvement engine. Weekly Telegram digest with one-tap "Add to FAQ".</p>
+    </div>
+    <div class="card">
+      <h4>Layer 3 — Update channels</h4>
+      <p>Kitchen Telegram chat: /86 lamb, /back lamb, /special truffle pasta. Manager Telegram for FAQ gaps. Owner-driven menu PDF ingestion for new restaurants — claims the onboarding wow moment ("30 minutes, not 30 days").</p>
+    </div>
+  </div>
+  <p class="body-mute">Why menu and FAQ aren't a single feature: 30–40% of weekday calls are not reservation calls — they're parking, hours, dress code, dietary, allergens. Without this pillar, Senior is worse than a tired host who at least knows the menu. With it, Senior reasons over the restaurant in real time.</p>
+</section>
+
+<section class="sec" id="s5">
+  <p class="eyebrow">Section 05 — prioritized feature matrix</p>
+  <h2 class="h2">Sorted by ROI for May 21, not by what's intellectually exciting.</h2>
+  <div class="matrix">
+    <div class="q-card q-1">
+      <h4>High impact / low effort — do all</h4>
+      <ul>
+        <li>Phone-keyed guests table + FKs</li>
+        <li>Caller recall greeting</li>
+        <li>Special occasion vault (capture)</li>
+        <li>Allergen + dietary vault</li>
+        <li>Missed-call SMS recovery (manual send)</li>
+        <li>Confirmation + day-of reminder SMS</li>
+        <li>VIP detection (rule + manual)</li>
+        <li>Daily 6 PM Telegram digest</li>
+        <li>Knowledge card "ask anything"</li>
+        <li>Manager-as-a-service escalation</li>
+      </ul>
+    </div>
+    <div class="q-card q-2">
+      <h4>High impact / medium effort — V0 stretch</h4>
+      <ul>
+        <li>Off-peak nudge with rule-based perks</li>
+        <li>Telegram manager copilot extended</li>
+        <li>Hidden async QA scoring (demo)</li>
+        <li>Menu Graph + real-time menu reasoning</li>
+        <li>Kitchen Copilot — minimal /86 /back</li>
+        <li>FAQ gap detection + weekly audit</li>
+        <li>Allergen-safe reasoning (cross-feature)</li>
+        <li>Menu-grounded upsells</li>
+      </ul>
+    </div>
+    <div class="q-card q-3">
+      <h4>High impact / high effort — V1 / post-investor</h4>
+      <ul>
+        <li>PDF menu ingestion (real version)</li>
+        <li>Real wait-list automation</li>
+        <li>Cross-restaurant guest passport</li>
+        <li>Multi-tenant routing</li>
+        <li>WhatsApp Business confirmation</li>
+        <li>Custom owner dashboard</li>
+        <li>POS integration</li>
+        <li>Voice ordering</li>
+      </ul>
+    </div>
+    <div class="q-card q-4">
+      <h4>Low value distractions — kill or defer</h4>
+      <ul>
+        <li>Wine pairing engine</li>
+        <li>Voice cloning of the actual hostess</li>
+        <li>Sentiment analysis dashboards</li>
+        <li>Custom voice model fine-tuning</li>
+        <li>Real-time spoken QA / live coaching</li>
+        <li>Public website before May 21</li>
+        <li>Multi-language at the call layer</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="s6">
+  <p class="eyebrow">Section 06 — twenty-eight features</p>
+  <h2 class="h2">Same 14-point template, every feature.</h2>
+  <p class="body-mute">Each card: number, name, V0 status, effort (1–10), perceived sophistication (1–10), time to ship. Click to expand the full analysis: what / why / who values it / what to reuse / fake MVP / data moat / future unlocks / risks / V0 verdict.</p>
+  <div class="controls">
+    <button class="btn" onclick="document.querySelectorAll('.feat').forEach(d=>d.open=true)">Expand all</button>
+    <button class="btn" onclick="document.querySelectorAll('.feat').forEach(d=>d.open=false)">Collapse all</button>
+    <button class="btn" onclick="document.querySelectorAll('.feat').forEach(d=>{d.open=d.querySelector('.b-v0')!==null||d.querySelector('.b-fake')!==null})">V0 only</button>
+  </div>
+
+<details class="feat" open>
+  <summary>
+    <span class="feat-num">01</span>
+    <h3 class="feat-name">Phone-keyed guests table</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 2</span>
+      <span class="badge b-num">soph 9</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">A new guests table in Supabase keyed on phone_e164 (unique). Foreign-keyed from calls.guest_id and reservations.guest_id. Holds: name, phone, first_seen_at, last_seen_at, visit_count, tier, preferences (jsonb), allergens (text[]), occasions (jsonb), notes, last_visit_summary, risk_flags.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">The single primitive. Without it, every other feature is a hack on a flat call log. Today phone is free text on reservations — that's a column, not an entity. Promoting the phone number to its own row turns Senior from a logging tool into a CRM.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Recognized by name. Doesn't repeat allergies. Same table as last time.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>First structured, queryable view of who guests actually are.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"6 months in: 4,000 structured profiles that didn't exist before. We own the schema."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>_shared/phone.ts already gives E.164. Existing webhook upserts.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>None — just build it. This is the floor.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>The biggest one. Every call adds a row. Twelve months in, irreplaceable.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Loyalty. Birthday campaigns. WhatsApp marketing. Cross-restaurant guest passport.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Phone-number ambiguity (shared household phone) — disambiguate by name. DPDP Act compliance — needs consent line + deletion endpoint. Cheap to add.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes. Build it first. Tomorrow. Everything else is downstream of this or not worth doing.</p>
+  </div>
+</details>
+
+<details class="feat" open>
+  <summary>
+    <span class="feat-num">02</span>
+    <h3 class="feat-name">Caller recall greeting</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 2</span>
+      <span class="badge b-num">soph 10</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">When a call comes in, lookup guests by phone_e164 and inject a 2–3 sentence context block into the prompt. "Returning guest. Anjali Mehta. Last visit 3 weeks ago, party of 4, window table. Vegetarian, no peanuts. Said it was her anniversary. Greet warmly by name, reference last visit if natural."</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">The single most demo-able feature in the entire roadmap. Investors will not remember the architecture diagram. They will remember the moment the founder dials in and the agent says "Welcome back, Raman — would you like the same window table for Saturday?"</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>The hospitality experience that previously required a 15-year veteran maître d'.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Personalized recognition without a senior host on every shift.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>Demo gold. Proof the guest graph is real and used in real time.</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Existing Zoronal tool-call infra. Add a lookup_guest tool.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Pre-seed 3–4 investor numbers in guests with rich context.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Reinforces #1. Richer context = better next greeting.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>VIP greetings. Occasion greetings. Apology greetings.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Creepiness threshold — "I see you ate the lamb chops last time" delights, "you came on a Tuesday with someone whose number isn't in our system" is a horror movie. Wrong-person false positive — confirm softly: "Am I speaking with Anjali?"</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes. This is the demo.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">03</span>
+    <h3 class="feat-name">Special occasion vault</h3>
+    <span class="feat-badges">
+      <span class="badge b-fake">V0 fake</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 8</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Detect occasions during call (birthday, anniversary, work celebration), store on guests.occasions. Nightly cron checks for guests with occasions in the next 7 days and either pings the manager or auto-drafts a personalized SMS for one-tap send.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Birthdays and anniversaries are the highest-revenue, highest-emotional-weight reservation type. Every restaurant says they want to do this; almost none do because there's no system to remember.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Feels remembered. Surprised on the day.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Repeat occasion bookings — currently the highest-margin type they're losing.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>Direct revenue lift you can quantify.</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Existing transcript pipeline + Telegram + Plivo SMS.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Manager-tap-Send via Telegram for first 2 weeks.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Per-restaurant calendar of every guest's occasions.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Outbound campaigns. Loyalty milestones. Targeted upsells.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Hallucinated dates — only persist clearly-extracted occasions, agent must confirm during call. Spam fatigue — cap at 1 occasion message per guest per restaurant per quarter.</p>
+    <p class="feat-verdict fv-fake">V0 verdict: Capture yes, outbound faked manually. Don't ship full automation by May 21.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">04</span>
+    <h3 class="feat-name">Off-peak nudge with rule-based perks</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 9</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">When a guest requests a peak slot that's full, the agent offers a curated alternative with a perk: "Saturday 8 PM is full, but if you're flexible, we have a quieter table at 6:30 with a complimentary dessert. Would that work?" Perk selected from a rules table per restaurant.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Indian restaurants under-utilize 5:30–7:00 PM and 10:00–11:30 PM dramatically. Lifting off-peak occupancy by 8% is meaningful margin because fixed costs are sunk. The single feature most likely to generate a measurable revenue line for the demo.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Gets a creative offer instead of "we're full". More likely to book.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Yield management without a yield management system.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"Senior shifted 23% of overflow into off-peak. ₹X recovered revenue."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>check-capacity already returns alternate_slots. Decorate with perk_offers.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Hardcode 3 perk templates per restaurant in seed.sql. No UI.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Perk × slot × tier conversion data is yours alone.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Real dynamic pricing. Demand forecasting. Cross-restaurant perk benchmarks.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Margin leakage — owners nervous about giving away desserts. Cap perks below X% occupancy, require owner approval, report cost vs recovered revenue. Devaluation if too predictable — owner-controlled cap.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — this is the revenue narrative.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">05</span>
+    <h3 class="feat-name">Missed-call SMS recovery</h3>
+    <span class="feat-badges">
+      <span class="badge b-fake">V0 fake</span>
+      <span class="badge b-num">effort 2</span>
+      <span class="badge b-num">soph 7</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Any call where the agent fails to capture a reservation triggers an SMS within 60 seconds. Manager sees a Telegram card with one-tap callback / pre-drafted SMS approve.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Indian restaurants lose 15–25% of inbound calls to silence/abandonment. Pure leak recovery — the demand was already there.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Doesn't have to remember to call back.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Recovered bookings, measurable in week one.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>Clean revenue line: "38 recovered bookings in month one."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Existing webhook + Plivo SMS API.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Manager taps Send. Pre-drafted card.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Recovery conversion by hang-up reason.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Multi-channel recovery. Pre-empt callbacks.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Spam complaints — one recovery SMS per number per 24h. Wrong-number SMS — don't send if call duration &lt; 5 seconds.</p>
+    <p class="feat-verdict fv-fake">V0 verdict: Yes — manager-tap-approved send.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">06</span>
+    <h3 class="feat-name">VIP detection (hybrid)</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 2</span>
+      <span class="badge b-num">soph 8</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Two-track. Rule-based: visit_count ≥ 3 → regular, ≥ 8 → vip. Manual override: managers tap "Mark as VIP" inline button on Telegram. Agent prompt reads guest.tier and adjusts tone, perk priority, escalation.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">VIPs in restaurants are worth disproportionately more. Identifying them automatically and ensuring every interaction reflects that is core hospitality. Doing it via the call agent is novel.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Recognized as important. Better seats. Skip the line.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Doesn't lose VIPs to less-attentive frontline. Standardizes treatment.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"Senior auto-protects the top 5% who drive 35% of revenue."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>guests table + Telegram callback.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Mark 2–3 numbers as VIP for the demo.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Per-restaurant, eventually cross-restaurant VIP graph.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>VIP events. White-glove escalation. Elite guest network.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>VIP scoring wrong — always allow manual override. Owner over-marks VIP — that's their problem; expose count in digest.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — keep it simple. Rule + manual.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">07</span>
+    <h3 class="feat-name">Telegram manager copilot — extended</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 8</span>
+      <span class="badge b-num">1.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Today the bot does Confirm/Decline. Extend to a full reservation cockpit: per-call card with Confirm/Decline/Mark VIP/Add Note/Send SMS Recovery/Block Number. Daily 6 PM digest. Slash commands /today, /tomorrow, /vip, /missed (V1).</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Telegram is the brilliant strategic choice. SMB owners live on WhatsApp and Telegram — a custom dashboard means they'd never log in. Telegram is push-native, low-friction, free, works on the worst phone in the worst village. Distribution moat for ops.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value (manager)</span><p>Zero login. Zero training. Zero learning curve.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>First-time visibility into every inbound. Owner can run FOH from another city.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"We don't need a dashboard because the manager already lives on Telegram."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>All existing Telegram infrastructure.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>V0: only Confirm/Decline/Mark VIP + digest. Slash commands V1.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Workflow lock-in. Each day = harder to switch.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Multi-staff roles. Cross-location alerts. Complaint escalation.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Notification fatigue — ping only confirm-required, missed, complaints, digest. Everything else goes to history.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — extend what you have, don't replace it.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">08</span>
+    <h3 class="feat-name">Daily owner pulse — 6 PM digest</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 9</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Scheduled Telegram message at 6 PM daily summarizing: calls handled, reservations confirmed, missed-call recoveries, VIPs who called, tomorrow's pre-bookings, one anomaly callout, one revenue callout.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">The owner doesn't open dashboards. They open Telegram. Every day at 6 PM, Senior reminds them why they pay you. This is the retention engine.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value (owner)</span><p>Zero-effort daily situational awareness.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>First data-driven recap of FOH activity.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>Drives reported usage. "94% open rate."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Telegram + Supabase pg_cron + Haiku for prose.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>First 2 weeks: hand-write the prose for TBDC.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Reinforces workflow lock-in.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Weekly digest. Anomaly alerts. Owner Q&amp;A.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Wrong tone — robot-feeling digest gets muted. Hand-tune to owner's voice. Stale on quiet days — single line if nothing to report.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — this is the retention slide.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">09</span>
+    <h3 class="feat-name">Knowledge card "ask anything" tool</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 8</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Promote knowledge_cards from static prompt context to a callable tool during the call. Agent answers off-script questions with confidence ("Is the lamb halal?", "Can I bring a dog?", "Is there a service charge?").</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Frontline staff give wrong FAQ answers constantly. Knowledge-grounded agent that says "I'll check on that — manager call back in 5 min" instead of hallucinating is the trust win.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Always gets the right answer or a graceful escalation.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Brand consistency. No more wrong info.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"Recall of a 10-year veteran on day one."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>knowledge_cards table + tool-call infra.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>For V0, embed in the system prompt directly. Promote to tool call in V1.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Per-restaurant knowledge corpus. Across fleet, structured F&amp;B graph.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Multi-language. Versioned knowledge. FAQ analytics.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Hallucination when card missing info — explicit "I'll check" fallback, no freelancing. Stale knowledge — surface updated_at if older than 30 days.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — already half-built. Finish it.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">10</span>
+    <h3 class="feat-name">Allergen &amp; dietary vault</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 2</span>
+      <span class="badge b-num">soph 9</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Extract allergens or dietary preferences during call, persist to guests.allergens (text array) and reservations.special_requests. Future calls inject: "I see you've mentioned a peanut allergy in the past — I'll flag it on the booking."</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Allergens are a safety issue. A restaurant that catches and surfaces them across visits is genuinely better. Gets a 5-star Google review.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Massive. Doesn't repeat. Feels safer.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Liability reduction. Better kitchen prep. Higher reviews.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"First system in Indian F&amp;B with structured allergen memory."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Same extraction pipeline as occasions.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>None — already simple.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Real allergen graph per restaurant.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Kitchen integration. Menu intelligence ("most-flagged is gluten").</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Liability if you persist a wrong allergen — always confirm during call before persisting; surface to manager on confirm.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">11</span>
+    <h3 class="feat-name">Confirmation + day-of reminder SMS</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 2</span>
+      <span class="badge b-num">soph 5</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">On confirm: SMS goes out. 2 hours before booking: reminder SMS ("Looking forward to seeing you tonight at 8 — reply CANCEL to free the table"). Day-after thank-you for VIPs.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">No-shows are 12–18% in Indian fine dining. Reminders cut that in half. Most boring feature on the list, largest immediate revenue impact.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Doesn't forget. Easy cancel.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Lower no-show rate. Recovered tables.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"No-shows from 14% to 6% in pilot."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Plivo SMS, pg_cron.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>None — just ship.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Reply-CANCEL data → no-show risk model.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>WhatsApp confirmation. Deposit-based booking.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Cancellation surge from reminders — actually fine, you'd rather know. Wrong number → spam — only send to numbers with successful inbound call.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">12</span>
+    <h3 class="feat-name">Hidden async QA scoring (DeepCall easter egg)</h3>
+    <span class="feat-badges">
+      <span class="badge b-v1">V0 cut → V1</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 10</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Every Senior call is scored async by Haiku on 6 dimensions (info accuracy, warmth, upsell attempt, occasion capture, allergen capture, escalation appropriateness). Persisted to calls.qa_scores. Not customer-facing in V0 — internal monitoring + investor narrative bridge to DeepCall.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Platform-narrative bridge. Don't ship DeepCall to investors — show that the architecture is already running it on yourself. Self-evaluation is the most credible signal an AI product company knows what it's doing.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value (V0)</span><p>None. Backend signal only.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value (V1)</span><p>"Last 100 calls scored 87/100 on warmth — here's where to tune."</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>Proves you're not a wrapper. Foundation for DeepCall.</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Transcript pipeline + Anthropic API.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Hand-score 5–10 calls in Notion/Retool for the demo.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Quality benchmarks across calls/restaurants/time. DeepCall training set.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>DeepCall as a product. Auto-prompt iteration. Quality reports.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Confusion in pitch — don't let it become the lead. Platform proof point, not the product.</p>
+    <p class="feat-verdict fv-no">V0 verdict: Cut from V0 to make room for Restaurant Brain. Hand-curate 5–10 scored calls for demo. Real version V1.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">13</span>
+    <h3 class="feat-name">Wait-list &amp; cancellation auto-fill</h3>
+    <span class="feat-badges">
+      <span class="badge b-fake">V0 capture only</span>
+      <span class="badge b-num">effort 4</span>
+      <span class="badge b-num">soph 7</span>
+      <span class="badge b-num">1.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">When a slot is full, agent offers: "Want me to text you if a table opens?" Capture intent. On cancellation, manager gets a Telegram nudge: "Anjali wanted Saturday 8 PM — send the SMS?"</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Recovered bookings. Signals the system thinks in demand, not just calls.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Doesn't lose the slot to inertia.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Higher fill rate. Recovered cancellations.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>Demand-side intelligence narrative.</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Existing tables + Telegram.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Capture only. Manual SMS via manager.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Waitlist → fill conversion data.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Real-time yield. VIP auto-rebooking.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Race conditions — two waitlisted guests both confirm. Send sequentially with 10-min hold.</p>
+    <p class="feat-verdict fv-fake">V0 verdict: Capture only. Manual SMS via Telegram. Don't build full automation.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">14</span>
+    <h3 class="feat-name">Manager-as-a-service escalation</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 2</span>
+      <span class="badge b-num">soph 8</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">When the agent encounters a request it shouldn't handle (group event, complaint, custom request, language mismatch), it warm-escalates: "Let me have Priya, our manager, call you back in 10 minutes." Logs an escalation row, pings manager with one-tap-call CTA.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">The trust mode. The agent never bullshits; it always has an escape hatch. This is what makes restaurants comfortable letting it run for real.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Doesn't get a worse experience than human.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Owner sleeps at night.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"Senior knows what it doesn't know."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Telegram + click-to-call link.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Already trivial — just ship.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Categorized escalation reasons → roadmap signal.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Per-category escalation policies. Staff-specific routing.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Over-escalation — manager hates the bot. Tune prompt + monitor rate; aim for &lt;15% of calls.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">15</span>
+    <h3 class="feat-name">Soft upsell cards (rule-based)</h3>
+    <span class="feat-badges">
+      <span class="badge b-replaced">replaced by 28</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Original V0: hardcoded upsell_cards table. Agent surfaces one when context fits. Replaced because hardcoded perks go stale in two weeks; menu-grounded upsells (#28) reason over the live menu graph and stay fresh forever.</p>
+    <p class="feat-verdict fv-no">V0 verdict: Replaced by Menu-Grounded Upsells (#28). Same time slot, strictly better product.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">16</span>
+    <h3 class="feat-name">Repeat-caller macros</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 1</span>
+      <span class="badge b-num">soph 7</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Pre-defined greeting variants by guest tier × time-of-day × occasion proximity. Embedded in the prompt, not separate code.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — embedded in the prompt.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">17</span>
+    <h3 class="feat-name">No-show risk score</h3>
+    <span class="feat-badges">
+      <span class="badge b-v1">V1</span>
+      <span class="badge b-num">effort 1</span>
+      <span class="badge b-num">soph 7</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Rule: no_shows / max(visits, 1). If &gt; 0.3 and visits ≥ 3, flag. Used to require deposit confirmation for high-risk bookings. Capture and surface only — don't enforce yet (avoids friction in early demo).</p>
+    <p class="feat-verdict fv-no">V0 verdict: Cut. Capture and surface only. Don't act on it yet.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">18</span>
+    <h3 class="feat-name">Caller-number block-list</h3>
+    <span class="feat-badges">
+      <span class="badge b-v1">V1</span>
+      <span class="badge b-num">effort 1</span>
+      <span class="badge b-num">soph 5</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Manager marks a number "do not book" (drunk, abusive, fake reservations). Agent declines politely and logs. Owner trust feature — not strategic for May 21.</p>
+    <p class="feat-verdict fv-no">V0 verdict: Cut to make room for Restaurant Brain. Owner trust feature, not investor-facing. V1.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">19</span>
+    <h3 class="feat-name">Demand heatmap (digest only)</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 1</span>
+      <span class="badge b-num">soph 8</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Aggregate missed/overflow bookings by (day, slot) → include in weekly Telegram digest. No separate dashboard.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Weekly only, embedded in digest.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">20</span>
+    <h3 class="feat-name">Failed-intent logging for prompt iteration</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 0</span>
+      <span class="badge b-num">soph 7</span>
+      <span class="badge b-num">free</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Whenever a call ends with intent='unclear', store transcript in a queue. Review weekly, improve the system prompt. Engine of continuous improvement (becomes faq_gaps in the addendum).</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — the engine of continuous improvement.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">21</span>
+    <h3 class="feat-name">The Menu Graph (structured dish ontology)</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 9</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">dishes + dish_tags + dish_allergens + dish_pairings schema. Per-restaurant menu, queryable in real time during a call. Relational ontology, not a vector store. SQL filters &lt;50ms over 40 dishes.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">The second pillar. Without it, the agent is a booking-taker. With it, the agent is a maître d'.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Correct, consistent answers about what's available, what's safe, what to try.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>First time the menu is a structured asset, not a PDF.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>The "two pillars" slide. "Most voice AI startups have a chat layer; we have a structured restaurant ontology."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Existing knowledge_cards migration pattern + _shared/ helpers.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Hand-write seed SQL with all ~40 TBDC dishes. No ingestion needed for demo.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Massive — proprietary structured menu data, evolving weekly via kitchen.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>All of #22, #24, #26, #27, #28. Eventually cross-restaurant menu benchmarks.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Schema rigidity for combos/modifiers — keep notes and description as free-text long tail. Stale data — weekly nudge if special_until &lt; today.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — schema and seed for TBDC. Build it.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">22</span>
+    <h3 class="feat-name">Real-time menu reasoning at call time</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 10</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">A menu_query tool the Zoronal agent invokes during a call with structured filter (category, tags, exclude_allergens, available_only, spice_max, pairs_with). Returns top matches; agent phrases the answer naturally.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">The demo moment investors will stress-test. Has to land 9 times out of 10. "Do you have anything Jain?", "I'm allergic to peanuts what's safe?", "Anything with truffle?".</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Answers feel grounded, confident, personalized to dietary needs.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Eliminates "I'll have to ask my manager" for menu questions.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"Senior reasons over your menu in real time." Show three live queries. Done.</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Zoronal tool-call infra; dishes schema from #21.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>None — ship for real. Query is too small to fake.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Query logs reveal which menu dimensions matter — feeds #26.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>#27 allergen-safe reasoning. #28 menu-grounded upsells. Personalized recs per tier.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Hallucination at edges — strict prompt: "if menu_query returns empty, say 'we don't have that' — never invent." Latency &gt;500ms stalls call — index right columns; pre-warm Supabase.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — this is the demo. Cannot ship without it.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">23</span>
+    <h3 class="feat-name">PDF / photo menu ingestion</h3>
+    <span class="feat-badges">
+      <span class="badge b-fake">V0 fake</span>
+      <span class="badge b-num">effort 5</span>
+      <span class="badge b-num">soph 10</span>
+      <span class="badge b-num">2d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Owner sends a menu PDF/JPG via Telegram. Async: Sonnet 4 extracts to JSON against the dishes schema. Owner gets a Telegram card: "47 dishes detected. Tap to review in batches."</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">The onboarding moment that turns "30-day implementation" into "30-minute implementation." V1 distribution unlock.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>None directly — owner workflow.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>"I sent a PDF and the system understood my menu" — WoM driver.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>The scaling story. "Onboarding takes 30 minutes, not 30 days."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Existing Telegram callback + Anthropic API.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>For May 21: hand-seed TBDC menu. Describe the flow + show screenshot.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Extraction quality compounds with every restaurant.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Self-serve onboarding. Multi-format support (Excel, Notion, Sheets).</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Extraction errors — always require human approval. IP/copyright — owner provides own menu, fine.</p>
+    <p class="feat-verdict fv-fake">V0 verdict: Fake for May 21 (hand-seed TBDC). Ship real version in next 14 days post-investor. Highest-impact post-investor item.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">24</span>
+    <h3 class="feat-name">Kitchen Copilot (live 86 loop)</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 9</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Kitchen has its own Telegram chat with Senior. Slash commands during service: /86 [dish], /back [dish], /special [name] [price] [portions], /note [dish] [note], /menu, /help. Agent on next call reflects state immediately.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">First time the kitchen has been part of the FOH digital loop in any Indian restaurant. Genuinely novel — competitors need a year to copy because they have to re-establish kitchen trust.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Caller never sold a dish 86'd 30 seconds ago.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>No wasted host time. No disappointed guests. Lifted same-day sales.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"We've turned the kitchen into a Telegram-controlled inventory layer."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>All Telegram infra + dishes schema.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Manager (not kitchen) sends slash commands for V0. Demo moment: founder types /86 lamb, dials in 30s later.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Per-restaurant 86 patterns → demand forecasting input.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Pre-orders. Inventory-aware reasoning. Cross-shift handoff.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Kitchen team adoption — start manager-driven, move to kitchen once validated. Stale 86s — midnight cron auto-resets is_available unless explicitly maintained.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — but minimal. Just /86, /back, /special. Full command set V1.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">25</span>
+    <h3 class="feat-name">FAQ gap detection + weekly knowledge audit</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 9</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Every "let me check" creates a faq_gaps row with caller's question and LLM-classified category. Weekly Telegram digest with one-tap "Add to FAQ" / "Dismiss" / "Already covered."</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">The self-improvement engine. Without engineering effort, FAQ corpus grows monotonically. After 90 days, richer FAQ than any human staff member could recite.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Each week, more callers get instant answers.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>First structured view of what customers are confused about.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>The "compounds without us" slide. "Senior gets smarter every week with zero engineering effort."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>failed_intents → faq_gaps. Same digest infra as #8.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Hand-curate 5 gaps from past 2 weeks of test calls. Demo: tap "Add" on stage; next call agent answers it.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Per-restaurant FAQ evolution log + cross-restaurant universal vs. local question patterns.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Auto-categorization → menu intelligence (#26). FAQ versioning. Multi-language generation.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Owner doesn't tap → gaps don't close. Monthly nudge: "you have 14 unresolved questions — top 3 are about parking."</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — and make it the closing demo moment.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">26</span>
+    <h3 class="feat-name">Menu intelligence reports for owners</h3>
+    <span class="feat-badges">
+      <span class="badge b-fake">V0 fake</span>
+      <span class="badge b-num">effort 4</span>
+      <span class="badge b-num">soph 10</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Weekly section in owner digest aggregating menu call data: "12 callers asked about Jain food this week — you have 3 dishes." "Lamb chops asked about 8 times — your highest-margin item, 6 booked." "3 callers asked about pasta — you don't have it. Consider adding?"</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Owners have never had this data. Currently they guess at what's resonating from server gossip. Turns Senior from cost center into strategic partner.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>None directly.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Real menu strategy intelligence. Gets owners to upgrade from "useful" to "essential."</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"We are not a feature. We are a strategic layer."</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Daily digest infra; menu_query logs; faq_gaps.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Hand-write first 2 weeks of reports. Once prose voice is right, automate.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>The slide for compounding value. Every week makes this report better.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Menu engineering recs. Procurement insights. Pricing intelligence. Cross-restaurant benchmarks.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Insight quality — bad report ("12 callers asked about food") worse than none. Ship only when prompt reliably produces 3+ specific insights per week.</p>
+    <p class="feat-verdict fv-fake">V0 verdict: Yes — even if hand-written, ship one weekly report by D10 to demo.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">27</span>
+    <h3 class="feat-name">Allergen-safe reasoning (cross-feature glue)</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 2</span>
+      <span class="badge b-num">soph 10</span>
+      <span class="badge b-num">0.5d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">When an allergen is in the conversation OR on the guest profile, the agent proactively filters menu suggestions and explicitly mentions safety. "Given the peanut allergy, I'd recommend the green curry, the lemon rice, or the grilled fish — all peanut-free. I'll flag your table so the kitchen knows."</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Allergens are the highest-emotional-weight, highest-trust hospitality moment. A restaurant that handles them consistently owns a reputation premium.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Massive. Real safety. Real recall.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Liability reduction. Repeat visits from allergen-cautious (high-LTV) guests.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>"First system in Indian F&amp;B with end-to-end structured allergen safety." Backed by #10 + #21 + #22 + #24.</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>All four features above — pure glue.</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>None — glue is small enough to ship.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Reinforces guest + menu graphs together.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Allergen-aware kitchen tickets. Allergen-aware notifications.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>False sense of safety — if a dish is mis-tagged peanut-free when it's not, real harm. Always confirm with caller during call; require kitchen acknowledgment on confirmed bookings with allergens.</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes. Demo this. It's a moment.</p>
+  </div>
+</details>
+
+<details class="feat">
+  <summary>
+    <span class="feat-num">28</span>
+    <h3 class="feat-name">Menu-grounded upsells (replaces #15)</h3>
+    <span class="feat-badges">
+      <span class="badge b-v0">V0 ship</span>
+      <span class="badge b-num">effort 3</span>
+      <span class="badge b-num">soph 9</span>
+      <span class="badge b-num">1d</span>
+    </span>
+  </summary>
+  <div class="feat-body">
+    <p class="feat-text">Replaces hardcoded perk-table upsells. Upsells now reasoned over the menu graph in real time. "Since it's an anniversary, our chef's tasting menu pairs beautifully with the Australian Shiraz." "Today's truffle risotto just had its first batch portions held back for tonight." Trigger logic stays rule-based; content pulls live from menu graph.</p>
+    <div class="feat-row"><span class="feat-label">Why it matters</span><p class="feat-text-mute">Hardcoded upsells go stale in two weeks. Menu-grounded upsells stay fresh forever because the menu graph stays fresh.</p></div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">User value</span><p>Discoveries that feel personal, not pushy.</p></div>
+      <div class="gcell"><span class="feat-label">Restaurant value</span><p>Higher cover value. Measurable.</p></div>
+      <div class="gcell"><span class="feat-label">Investor value</span><p>Real revenue lift, grounded in real menu intelligence.</p></div>
+    </div>
+    <div class="feat-grid">
+      <div class="gcell"><span class="feat-label">Reuse</span><p>Menu graph (#21) + menu_query (#22) + occasion vault (#3).</p></div>
+      <div class="gcell"><span class="feat-label">Fake MVP</span><p>Hand-curate "upsell candidates" via dishes.is_upsell_candidate boolean. ML scoring V2.</p></div>
+      <div class="gcell"><span class="feat-label">Data moat</span><p>Upsell conversion by (dish × context) → real recommendation engine.</p></div>
+      <div class="gcell"><span class="feat-label">Unlocks</span><p>Personalized upsells per tier. Time-of-day specific. Cross-sell.</p></div>
+    </div>
+    <p class="feat-text-mute"><span class="tag tag-warn">Risk</span>Robotic — cap at 1 upsell per call, only when context is strong (occasion, large party, VIP, off-peak nudge).</p>
+    <p class="feat-verdict fv-yes">V0 verdict: Yes — replaces #15. Strictly better.</p>
+  </div>
+</details>
+
+</section>
+
+<section class="sec" id="s7">
+  <p class="eyebrow">Section 07 — V0 scope decisions</p>
+  <h2 class="h2">Sixteen ship by May 17. Five cuts. Six fakes.</h2>
+  <div class="row r3">
+    <div class="card pillar-teal">
+      <h4>Ship by May 17 — sixteen items</h4>
+      <p>Guests table + FKs · caller recall · knowledge card "ask anything" · allergen vault · special occasion capture · off-peak nudge · missed-call SMS recovery · confirmation + reminder SMS · VIP detection · Telegram extended copilot · daily 6 PM digest · escalation · Menu Graph + seed · menu_query tool · Kitchen /86 · FAQ gap detection · allergen-safe reasoning · menu-grounded upsells · weekly demand digest · failed-intent log · hand-curated menu intelligence report</p>
+    </div>
+    <div class="card">
+      <h4>Cut from V0 → V1 — five items</h4>
+      <p>Hidden async QA scoring (hand-curate 5–10 calls for demo) · block-list (V1) · no-show risk acting (capture only) · soft upsell hardcoded (replaced by #28) · Telegram slash commands /today /vip /missed (V1) · real wait-list automation (capture intent only) · PDF menu ingestion (fake for May 21, real V1)</p>
+    </div>
+    <div class="card pillar-purple">
+      <h4>Faked manually — six workflows</h4>
+      <p>Missed-call recovery SMS (manager taps Send) · occasion outbound (manager taps Send) · wait-list fill (manager handles via Telegram) · demand heatmap "dashboard" (Retool internal-only) · per-restaurant prompt tuning (you edit weekly from failed-intent logs) · cross-restaurant insights (you tweet / put in deck what TBDC taught you)</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="s8">
+  <p class="eyebrow">Section 08 — what to fake and why</p>
+  <h2 class="h2">Anything that's a 1:1 manager workflow should be a Telegram-tap, not an autosend.</h2>
+  <p class="body-mute">This buys three things at once: trust (manager has final say, dumb output never reaches the customer), tuning data (every "Send" or "Edit" tap teaches you the exact phrasing the manager prefers — faster than any automated system), and demo polish (you can pre-tap during the May 21 demo to make the flow feel seamless). This is not lying. This is product-led design with humans in the loop while you tune.</p>
+  <table>
+    <colgroup><col style="width: 28%"><col style="width: 36%"><col style="width: 36%"></colgroup>
+    <thead><tr><th>Workflow</th><th>V0 reality</th><th>What investor sees</th></tr></thead>
+    <tbody>
+    <tr><td>Missed-call recovery SMS</td><td>Manager taps Send on pre-drafted card</td><td>Auto-recovery</td></tr>
+    <tr><td>Occasion outbound</td><td>Manager taps Send</td><td>Auto-campaign</td></tr>
+    <tr><td>Wait-list fill</td><td>Manager taps Send when cancellation happens</td><td>Wait-list auto-fill</td></tr>
+    <tr><td>Demand heatmap</td><td>Retool view connected to Supabase, only you see it</td><td>Real ops console</td></tr>
+    <tr><td>Per-restaurant prompt tuning</td><td>You edit maya-prompt.md weekly from failed-intent logs</td><td>"Continuous learning loop"</td></tr>
+    <tr><td>Cross-restaurant insights</td><td>You tweet / deck what TBDC taught you</td><td>"Network effects emerging"</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="sec" id="s9">
+  <p class="eyebrow">Section 09 — what impresses whom</p>
+  <h2 class="h2">Three audiences, three priority orders. Don't conflate them.</h2>
+  <div class="row r3">
+    <div class="card">
+      <h4>Investors (May 21)</h4>
+      <p>1. Live phone call where Senior recognizes the caller. 2. Telegram bot handling a real reservation in real time. 3. The data layer slide with numbers. 4. The "self-evaluating AI" slide as bridge to DeepCall. 5. Category positioning — guest OS for Indian hospitality. 6. Velocity — built in 14 days, 3 Edge Functions.</p>
+    </div>
+    <div class="card">
+      <h4>Restaurants</h4>
+      <p>1. Recovered bookings in rupees in the daily digest. 2. No missed calls. 3. The owner's spouse dials in and gets recognized by name. 4. A digest that reads like senior staff wrote it. 5. Zero new app to install — Telegram already won.</p>
+    </div>
+    <div class="card">
+      <h4>Real retention</h4>
+      <p>The guest data they can't reconstruct. Telegram workflow muscle memory. Daily digest open rate (90%+). The handful of personal "wow" moments owners tell other owners about. NPS-driven retention beats feature breadth every time.</p>
+    </div>
+  </div>
+  <h3>What does NOT impress investors</h3>
+  <ul class="list">
+    <li>A long architectural diagram. One slide max.</li>
+    <li>A roadmap promising 9 features in 6 months. Three SKUs over 18 months max.</li>
+    <li>Unit economics math at this stage. You don't have data.</li>
+    <li>TAM math from a McKinsey deck. Bottom-up: 75K dine-in restaurants, ARPU ₹X, serviceable Y%.</li>
+    <li>A flashy public website.</li>
+  </ul>
+  <h3>What does NOT impress restaurants</h3>
+  <ul class="list">
+    <li>Fancy dashboards. They won't open them.</li>
+    <li>Multi-language for the first restaurant in Khan Market.</li>
+    <li>Voice cloning of their hostess — they find it creepy.</li>
+    <li>Long onboarding. Anything &gt; 30 minutes is dead.</li>
+  </ul>
+</section>
+
+<section class="sec" id="s10">
+  <p class="eyebrow">Section 10 — the demo moments</p>
+  <h2 class="h2">Five moments. One goes live. Four go in the deck as screenshots.</h2>
+  <p class="body-mute">Live demos that compound risk don't compound impact — one flawless live moment beats five shaky ones. Recommend caller recall live, the others narrated.</p>
+  <div class="row r2">
+    <div class="demo demo-pick">
+      <p class="demo-num">01<span class="demo-pick-badge">live pick</span></p>
+      <h4>Caller recall</h4>
+      <p><q>Welcome back, Mr Sharma. Window table again?</q></p>
+    </div>
+    <div class="demo">
+      <p class="demo-num">02</p>
+      <h4>Menu reasoning</h4>
+      <p><q>I have a peanut allergy — what's safe?</q> Four dishes named with confidence.</p>
+    </div>
+    <div class="demo">
+      <p class="demo-num">03</p>
+      <h4>Kitchen 86 live</h4>
+      <p>Founder types /86 lamb chops. Thirty seconds later, the agent tells the next caller it's sold out.</p>
+    </div>
+    <div class="demo">
+      <p class="demo-num">04</p>
+      <h4>FAQ self-improvement</h4>
+      <p>Question not in the FAQ. Founder taps Add. Agent answers it on the next call.</p>
+    </div>
+    <div class="demo">
+      <p class="demo-num">05</p>
+      <h4>Telegram confirm mid-pitch</h4>
+      <p>Reservation pings the manager during the demo. One tap. SMS goes out. No slides.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="s11">
+  <p class="eyebrow">Section 11 — positioning &amp; category</p>
+  <h2 class="h2">Keep the name Senior. Lead with "AI front-of-house". Coin "Guest OS" for the deck.</h2>
+  <div class="row r2">
+    <div class="card">
+      <h4>Tagline (one line)</h4>
+      <p>"The AI host every restaurant wishes it could hire."</p>
+    </div>
+    <div class="card">
+      <h4>Category line (10 words)</h4>
+      <p>"Senior is the guest operating system for Indian hospitality."</p>
+    </div>
+  </div>
+  <div class="callout">
+    <p class="callout-q">India's restaurants live on the phone, but the phone is the worst part of their operation. Calls get missed, callers don't get recognized, frontline staff churn at 60% a year, and there's no system that remembers anything. Senior is the AI front-of-house that picks up every call, recognizes every returning guest by phone, captures their preferences and occasions, and gives the manager a Telegram-native console for the entire reservation operation. Each call adds to a guest profile that didn't exist before. The phone call is the wedge; the guest graph is the product.</p>
+  </div>
+  <h3>Names to avoid</h3>
+  <ul class="list list-tight">
+    <li>"AI receptionist" — too narrow</li>
+    <li>"Voice AI" — too horizontal</li>
+    <li>"Conversational AI for restaurants" — sleep-inducing</li>
+    <li>"Restaurant chatbot" — kill on sight</li>
+    <li>Anything ending in -ai (.ai is dead in 2026 positioning)</li>
+    <li>"GrowwMaxx" (sounds like fintech) and "DeepCall" (keep as second SKU)</li>
+  </ul>
+</section>
+
+<section class="sec" id="s12">
+  <p class="eyebrow">Section 12 — why we are not bland or vapi</p>
+  <h2 class="h2">They sell minutes. We sell guest relationships.</h2>
+  <p class="body-mute">State this explicitly in the pitch. The competitors investors will mention are Bland, Vapi, Retell, and a couple of Indian voice startups. Put a slide titled "Why we are not Bland" in the deck. Investors love that you've thought about it.</p>
+  <table>
+    <colgroup><col style="width: 50%"><col style="width: 50%"></colgroup>
+    <thead><tr><th>Them — horizontal voice infra</th><th>Senior — vertical hospitality app</th></tr></thead>
+    <tbody>
+    <tr><td><span class="tag tag-them">them</span>Sell minutes; vertical-agnostic</td><td><span class="tag tag-us">senior</span>Sell guest relationships; F&amp;B-native prompt, knowledge cards, escalation, perks</td></tr>
+    <tr><td><span class="tag tag-them">them</span>No proprietary data layer</td><td><span class="tag tag-us">senior</span>Guest Graph + Restaurant Brain per restaurant</td></tr>
+    <tr><td><span class="tag tag-them">them</span>Sell to engineers via API</td><td><span class="tag tag-us">senior</span>Sell to restaurant owners via Telegram</td></tr>
+    <tr><td><span class="tag tag-them">them</span>Tuned for US English call centers</td><td><span class="tag tag-us">senior</span>Hindi-English code-switching, Telegram/WhatsApp ops, phone-first reservation culture</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="sec" id="s13">
+  <p class="eyebrow">Section 13 — defensibility &amp; moats</p>
+  <h2 class="h2">In order of strength: data, workflow, prompt, attention, network.</h2>
+  <ul class="list">
+    <li><b>The guest graph.</b> Every call → guest row. Every richer row → better next call → higher repeat rate → more calls. Canonical SaaS data flywheel, starts day one. Strongest moat by a wide margin.</li>
+    <li><b>Workflow lock-in via Telegram.</b> Manager's daily ops are in your bot. After 60 days: switching costs include retraining muscle memory, losing alert history, re-onboarding staff.</li>
+    <li><b>Restaurant-specific prompt tuning.</b> Each restaurant's maya-prompt.md customized for menu, voice, neighborhood. Over 30+ days, accumulates a non-portable persona.</li>
+    <li><b>Failed-intent corpus.</b> Every failure adds a row. Becomes a domain-specific test set nobody else has. Eventually seeds a hospitality-specific fine-tune.</li>
+    <li><b>Owner attention share.</b> 6 PM digest is the only daily product touch. Habit beats features.</li>
+    <li><b>Cross-restaurant guest passport (long-term).</b> Same +91 across N restaurants → guest network. Don't pitch this on May 21 — too speculative.</li>
+    <li><b>India-specific operational depth.</b> Festival calendars, regional cuisine, language code-switching, payment patterns, Plivo+Telegram integration. Each small; together, a 12-month India localization barrier for any US entrant.</li>
+  </ul>
+  <h3>What is hard to copy vs easy to copy</h3>
+  <div class="row r2">
+    <div class="card pillar-teal">
+      <h4>Hard to copy</h4>
+      <p>The exact daily digest tone (per-restaurant cluster tuning). The Telegram workflow design. The hidden QA scoring rubric. The 30-day-old guest profiles a competitor can't have on day one.</p>
+    </div>
+    <div class="card">
+      <h4>Easy to copy (don't over-claim)</h4>
+      <p>The voice agent itself (Zoronal, Vapi, Bland — all viable). The knowledge card schema. Off-peak nudging logic. Once you describe it in a deck, anyone can do it. Honest moat story: voice layer is commoditized; data + workflow layer are not.</p>
+    </div>
+  </div>
+  <div class="callout">
+    <p class="callout-q">Within 12 months across the Senior fleet: 500K+ calls handled, 80K+ structured guest profiles, 1.2M+ failed-intent rows becoming the largest hospitality conversation dataset in India, and the first cross-restaurant guest graph in Indian F&amp;B. None of this exists today. None of it can be reconstructed by a competitor without three years of restaurant-by-restaurant operations.</p>
+  </div>
+</section>
+
+<section class="sec" id="s14">
+  <p class="eyebrow">Section 14 — CTO reality check</p>
+  <h2 class="h2">Honest answer: yes, eleven-day-feasible — barely, only if you respect the cuts.</h2>
+  <p class="body-mute">Mapped against your actual codebase. Zoronal (vendor) + Supabase Edge Functions (Deno/TS) + Telegram bot. Respects every CLAUDE.md hard rule (150-line cap, idempotent writes, zod-validated, Asia/Kolkata correctness, time math in _shared/time.ts, phones via _shared/phone.ts).</p>
+  <h3>Shippable in 7–14 days</h3>
+  <ul class="list list-tight">
+    <li>Schema migration (guests, FKs, perk_rules, dishes, dish_tags, dish_allergens, dish_pairings, faq_items, faq_gaps, escalations, waitlist) — half a day.</li>
+    <li>Caller recall — _shared/guests.ts + Zoronal lookup_guest tool — half a day.</li>
+    <li>Extractor (allergens, occasions, FAQ gap classification) — _shared/extractor.ts with zod schema — 1 day.</li>
+    <li>Off-peak nudge — extend check-capacity, seed perk_rules — 1 day.</li>
+    <li>Missed-call SMS + Telegram Send button — half a day.</li>
+    <li>Confirmation + reminder SMS via pg_cron — half a day.</li>
+    <li>VIP detection — guests_view + manual toggle — half a day.</li>
+    <li>Telegram extended cards — 1 day, all in telegram-callback.</li>
+    <li>Daily digest — pg_cron + daily-digest function with Haiku prose — 1 day.</li>
+    <li>Manager-as-a-service escalation — half a day.</li>
+    <li>Menu graph seed — half a day if non-engineering does data entry.</li>
+    <li>menu_query endpoint + tool wiring — 1 day.</li>
+    <li>Kitchen Copilot minimal (/86 /back /special) — 1 day.</li>
+    <li>FAQ gap capture + weekly digest — 1 day.</li>
+    <li>Allergen-safe reasoning glue — half a day.</li>
+    <li>Hand-curated menu intelligence weekly report — half a day.</li>
+  </ul>
+  <p class="body-mute">Total ~9 engineering days + 2 days for prompt tuning, demo prep, edge cases. Fits in 11 days with one buffer.</p>
+
+  <h3>Highest-risk components</h3>
+  <ul class="list list-tight">
+    <li><b>Menu seed data.</b> Hand-entering 40 dishes with tags, allergens, descriptions is grunt work. Someone non-engineering at TBDC does it in a Google Sheet. You write a one-time CSV-to-SQL importer.</li>
+    <li><b>Menu query latency.</b> If menu_query &gt;500ms during a live call, the agent stalls. Index the right columns; pre-warm Supabase connections.</li>
+    <li><b>Allergen tagging accuracy.</b> Mis-tag a dish "peanut-free" when it's not = real harm. Manually verify allergen tags, twice, before D11.</li>
+    <li><b>Live /86 race conditions.</b> Kitchen sets /86 while a call is mid-air asking about lamb. Lock the read on call start.</li>
+  </ul>
+
+  <h3>Requires real engineering — DO NOT ship by May 21</h3>
+  <ul class="list list-tight">
+    <li>Real wait-list automation with race-safe holds</li>
+    <li>Multi-tenant routing (CLAUDE.md says single-tenant V0 — respect it)</li>
+    <li>Custom web dashboard (use Retool internally)</li>
+    <li>WhatsApp Business API (regulatory + Meta provider integration, 2–3 weeks alone)</li>
+    <li>POS integration (each POS different; partnership motion)</li>
+    <li>Real-time spoken QA (different system entirely)</li>
+    <li>Voice cloning / custom voice (vendor-locked, infra cost, not strategic)</li>
+    <li>Vector search over the menu (SQL filters sufficient at 40 dishes)</li>
+    <li>Custom menu editor UI (Telegram + SQL fine)</li>
+    <li>Real-time websocket between kitchen and call agent (polling on each call fine)</li>
+  </ul>
+</section>
+
+<section class="sec" id="s15">
+  <p class="eyebrow">Section 15 — rule-based vs prompt-based vs async LLM</p>
+  <h2 class="h2">The frame: rules where you understand the logic, prompts where the model needs to be diplomatic, async LLM where latency doesn't matter.</h2>
+  <div class="row r3">
+    <div class="card pillar-teal">
+      <h4>Rule-based</h4>
+      <p>VIP tier (visit_count thresholds + risk flags). Off-peak detection (occupancy threshold per slot). No-show risk (no_shows / visits). Reminder timing (cron). Block-list enforcement. Perk eligibility.</p>
+    </div>
+    <div class="card pillar-purple">
+      <h4>Prompt-based (LLM at runtime)</h4>
+      <p>Caller recall greeting (inject context, let model phrase warmly). Soft upsell timing (judgment in conversation). Special occasion detection during call. Knowledge card lookups. Escalation phrasing. Daily digest prose.</p>
+    </div>
+    <div class="card">
+      <h4>Async LLM (post-call, no critical path)</h4>
+      <p>Allergen extraction. Occasion extraction. Call summarization. QA scoring. Failed-intent classification.</p>
+    </div>
+  </div>
+  <h3>Should NOT be ML in V0</h3>
+  <ul class="list list-tight">
+    <li>VIP detection — use rule</li>
+    <li>Yield optimization — use rule</li>
+    <li>No-show prediction — use rule</li>
+    <li>Demand forecasting — use rule, eyeballed by you</li>
+  </ul>
+</section>
+
+<section class="sec" id="s16">
+  <p class="eyebrow">Section 16 — eleven-day plan to may 21</p>
+  <h2 class="h2">Day-by-day, sized against the existing edge function architecture.</h2>
+  <div class="tl">
+    <div class="tl-day">D1 Mon May 11</div>
+    <div class="tl-task">Schema migrations: guests + FKs, perk_rules, escalations, dishes / dish_tags / dish_allergens / dish_pairings, faq_items, faq_gaps. Deploy to staging.</div>
+    <div class="tl-day">D2 Tue</div>
+    <div class="tl-task">Caller recall: _shared/guests.ts + lookup_guest tool. Hand-seed TBDC menu (~40 dishes). menu_query endpoint live.</div>
+    <div class="tl-day">D3 Wed</div>
+    <div class="tl-task">Extractor: allergens + occasions + FAQ gap classification. zod schemas. Test on real transcripts.</div>
+    <div class="tl-day">D4 Thu</div>
+    <div class="tl-task">Off-peak nudge: extend check-capacity, seed perk_rules. Menu-grounded upsells (replaces hardcoded). End-to-end test.</div>
+    <div class="tl-day">D5 Fri</div>
+    <div class="tl-task">Missed-call SMS recovery + Telegram Send button. Confirmation + reminder SMS via pg_cron.</div>
+    <div class="tl-day">D6 Sat</div>
+    <div class="tl-task">VIP detection rule + manual toggle. Kitchen Copilot — /86, /back, /special. Test with kitchen team.</div>
+    <div class="tl-day">D7 Sun</div>
+    <div class="tl-task">Telegram extended cards (Confirm/Decline/Mark VIP/Send SMS/Block). Allergen-safe reasoning glue.</div>
+    <div class="tl-day">D8 Mon May 18</div>
+    <div class="tl-task">Daily digest function. Manually run for 3 days of historical data. First hand-curated menu intelligence weekly report.</div>
+    <div class="tl-day">D9 Tue</div>
+    <div class="tl-task">FAQ gap weekly digest. Manager-as-a-service escalation. Failed-intent logging. Hand-score 5–10 calls offline (QA scorer demo proxy).</div>
+    <div class="tl-day">D10 Wed</div>
+    <div class="tl-task">END-TO-END dry runs with founder, an investor, an alpha tester. Tune prompt on every failure. Pre-seed investor numbers in guests for the demo.</div>
+    <div class="tl-day">D11 Thu May 21</div>
+    <div class="tl-task">Demo. Pitch.</div>
+  </div>
+</section>
+
+<section class="sec" id="s17">
+  <p class="eyebrow">Section 17 — final V0 stack</p>
+  <h2 class="h2">The pitch in one screen.</h2>
+  <div class="callout">
+    <p class="callout-q">Senior is the AI front-of-house for restaurants. Picks up every inbound call with the warmth and recall of your most senior host. Recognizes returning guests by phone number. Captures preferences, allergies, and occasions. Steers demand into off-peak slots with rule-based perks. Pings the manager via Telegram for confirmations, escalations, and a daily 6 PM digest. Sends confirmation and reminder SMS to reduce no-shows. Self-evaluates every call via an async QA scorer that doubles as the foundation of a future product, DeepCall. Built in 14 days on Zoronal + Supabase + Telegram. Deployed at The Blue Door Cafe, Khan Market. Three Edge Functions. ~600 lines of business logic. The guest graph it builds is proprietary and compounds.</p>
+  </div>
+
+  <h3>Voice plane (vendor)</h3>
+  <p class="body-mute">Zoronal — call routing, ASR, TTS, prompt execution, tool calling. Configured via dashboard, not code.</p>
+
+  <h3>Data plane (Supabase, ap-south-1)</h3>
+  <table>
+    <colgroup><col style="width: 35%"><col style="width: 65%"></colgroup>
+    <thead><tr><th>Table</th><th>Purpose</th></tr></thead>
+    <tbody>
+    <tr><td>restaurants</td><td>existing</td></tr>
+    <tr><td>knowledge_cards</td><td>existing — extend with category for upsells</td></tr>
+    <tr><td>capacity_caps</td><td>existing</td></tr>
+    <tr><td>calls</td><td>existing — add qa_scores, guest_id, escalation_reason</td></tr>
+    <tr><td>reservations</td><td>existing — add guest_id</td></tr>
+    <tr><td>guests <span class="tag tag-good">new</span></td><td>phone-keyed, the core primitive</td></tr>
+    <tr><td>dishes <span class="tag tag-good">new</span></td><td>per-restaurant menu ontology</td></tr>
+    <tr><td>dish_tags / dish_allergens / dish_pairings <span class="tag tag-good">new</span></td><td>relational menu attributes</td></tr>
+    <tr><td>faq_items / faq_gaps <span class="tag tag-good">new</span></td><td>FAQ corpus + self-improvement queue</td></tr>
+    <tr><td>perk_rules <span class="tag tag-good">new</span></td><td>per-restaurant off-peak rules</td></tr>
+    <tr><td>escalations <span class="tag tag-good">new</span></td><td>log of escalations</td></tr>
+    <tr><td>waitlist <span class="tag tag-good">new</span></td><td>capture intent only, manual fill</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Backend (Supabase Edge Functions, Deno)</h3>
+  <ul class="list list-tight">
+    <li>check-capacity (existing — extend to return perk_offers)</li>
+    <li>zoronal-webhook (existing — add guest upsert, extractor call, missed-call branch)</li>
+    <li>telegram-callback (existing — add VIP toggle, Send SMS, Block, /86 commands)</li>
+    <li>menu-query <span class="tag tag-good">new</span> — Zoronal tool endpoint, indexed SQL filter</li>
+    <li>daily-digest <span class="tag tag-good">new</span> — pg_cron, summarizes the day</li>
+    <li>qa-scorer <span class="tag tag-good">V1</span> — async, scores every completed call</li>
+    <li>reminders <span class="tag tag-good">new</span> — pg_cron, confirmation + 2hr-before SMS</li>
+    <li>_shared/guests.ts, _shared/extractor.ts, _shared/perks.ts, _shared/sms.ts, _shared/menu.ts — helpers</li>
+  </ul>
+
+  <h3>Ops + outbound planes</h3>
+  <p class="body-mute"><b>Ops (Telegram):</b> per-call card with full context + inline action buttons; daily 6 PM digest; escalation alerts; Send-SMS approval cards; kitchen chat with /86 commands. <b>Outbound (Plivo SMS):</b> auto confirmation, auto day-of reminder, manager-approved recovery SMS, manager-approved occasion outbound. <b>Observability:</b> Supabase Logs (per CLAUDE.md rule #10) + QA score table + the daily digest as the human-readable observability layer.</p>
+</section>
+
+<section class="sec" id="s18">
+  <p class="eyebrow">Section 18 — what compounds</p>
+  <h2 class="h2">Twelve months in, here's what no competitor can reconstruct.</h2>
+  <div class="row r3">
+    <div class="metric"><p class="mn">80K+</p><p class="ml">structured guest profiles, phone-keyed, with preferences and allergens</p></div>
+    <div class="metric"><p class="mn">50+</p><p class="ml">menus catalogued as queryable ontologies with allergen and dietary tags</p></div>
+    <div class="metric"><p class="mn">1.2M+</p><p class="ml">conversation rows — the largest hospitality voice dataset in India</p></div>
+  </div>
+  <div class="row r3">
+    <div class="metric"><p class="mn">500K+</p><p class="ml">calls handled across the fleet</p></div>
+    <div class="metric"><p class="mn">94%</p><p class="ml">target daily digest open rate by the manager / owner</p></div>
+    <div class="metric"><p class="mn">1</p><p class="ml">cross-restaurant guest graph (consent-gated, not pitched May 21)</p></div>
+  </div>
+  <p class="body-mute">Numbers illustrative — calibrate to your actual ramp. None of this exists today. None of it can be reconstructed by a competitor without three years of restaurant-by-restaurant operations.</p>
+</section>
+
+<section class="sec" id="s19">
+  <p class="eyebrow">Section 19 — what i'd be worried about</p>
+  <h2 class="h2">Six honest concerns. Plan for each.</h2>
+  <ul class="list">
+    <li><b>Single-restaurant demo risk.</b> The entire May 21 narrative rests on TBDC working flawlessly. If Zoronal hiccups mid-demo, the room cools. Have a backup pre-recorded demo of a flawless call alongside the live one. Don't be too proud to use the recording if needed.</li>
+    <li><b>QA / DeepCall narrative dilution.</b> Your project description has DeepCall and Senior intertwined. In the May 21 pitch, decouple them firmly. Senior is the product. DeepCall is the evidence the platform thinks bigger — slide 11, not slide 3.</li>
+    <li><b>Manager workflow assumption.</b> You're assuming the TBDC manager will tap Telegram buttons reliably. Pilot for 5 days before the demo. If they don't tap, you don't have a workflow story; you have a broken loop.</li>
+    <li><b>"Guest graph" can sound abstract.</b> Counter with the concrete data slide: "Here are 47 anonymized guest profiles built in 14 days." Show actual rows. Concreteness beats abstraction.</li>
+    <li><b>Last-48-hour feature temptation.</b> Every feature added on D10 has a 50% chance of breaking the demo on D11. Last 48 hours are for prompt tuning, edge cases, rehearsal.</li>
+    <li><b>The investor ask.</b> What are you raising? What for? What milestone does the round buy? Don't walk in without a clean answer. The product story above lands an investor; the ask story closes the round.</li>
+  </ul>
+</section>
+
+<section class="sec" id="s20">
+  <p class="eyebrow">Section 20 — tomorrow morning</p>
+  <h2 class="h2">If you ship steps 1–10 by Tuesday EOD, the architecturally hard part is done.</h2>
+  <ol class="ck-list">
+    <li>Open Supabase Studio. Write 0002_guests.sql. Run on staging.</li>
+    <li>Update _shared/types.ts to include the Guest type.</li>
+    <li>Write _shared/guests.ts with upsertGuestFromCall() and getGuestContext(phoneE164).</li>
+    <li>Patch zoronal-webhook to call upsertGuestFromCall on every webhook.</li>
+    <li>Add a lookup_guest tool in Zoronal's tool config; make it call a tiny new endpoint that wraps getGuestContext.</li>
+    <li>Update docs/maya-prompt.md with the recall greeting logic. Run scripts/sync-prompt.sh.</li>
+    <li>Make a test call with your own number. Make a second test call. Confirm the agent greets you back.</li>
+    <li>Write 0003_restaurant_brain.sql — dishes, dish_tags, dish_allergens, dish_pairings, faq_items, faq_gaps. Run on staging.</li>
+    <li>Send TBDC a Google Sheets template for menu entry (40 rows, columns: name, category, price, spice level, dietary tags, allergens, description, signature/special). Get it back by D2.</li>
+    <li>Update docs/maya-prompt.md to plan for the menu_query tool — even before it's wired, set up the prompt structure so D2 is just plugging in the endpoint.</li>
+  </ol>
+</section>
+
+<section class="sec" id="s21">
+  <p class="eyebrow">Section 21 — user flows (CTO review)</p>
+  <h2 class="h1">Eleven flows. Each one with actors, sequence, data writes, latency budgets, and failure modes.</h2>
+  <p class="body-mute">Written for the CTO. Every flow uses real table names, real function endpoints, and explicit idempotency rules. Where latency matters (during a live call), it's annotated. Where a flow has a "manager-tap" instead of full automation, it's labeled — that's V0 by design, not omission. Names of edge functions match section 17 of this doc.</p>
+
+  <div class="actor-legend">
+    <span class="legend-h">Actors</span>
+    <span class="actor a-caller">caller</span>
+    <span class="actor a-plivo">plivo</span>
+    <span class="actor a-zoronal">zoronal</span>
+    <span class="actor a-fn">edge fn</span>
+    <span class="actor a-pg">postgres</span>
+    <span class="actor a-tg">telegram</span>
+    <span class="actor a-sms">plivo sms</span>
+    <span class="actor a-mgr">manager</span>
+    <span class="actor a-kit">kitchen</span>
+    <span class="actor a-cron">cron</span>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F1</span>
+      <h4>Returning guest → recall greeting → reservation captured</h4>
+      <span class="uflow-meta">target: &lt;2s before agent's first audible word · idempotent on webhook retry</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>Inbound call to TBDC's Plivo DID. Caller's phone_e164 already exists in <code>guests</code>.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-caller">caller</span><span class="step-text">Dials TBDC's published number.</span></li>
+      <li><span class="actor a-plivo">plivo</span><span class="step-text">Routes inbound to Zoronal SIP trunk configured for this restaurant_id.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Pre-call hook: <code>POST /lookup-guest</code> with <code>{phone_e164, restaurant_id}</code>. <span class="lat">timeout 200ms</span></span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>getGuestContext()</code> in _shared/guests.ts: <code>SELECT name, last_seen_at, last_visit_summary, allergens, occasions, tier, visit_count FROM guests WHERE phone_e164=$1 AND restaurant_id=$2 LIMIT 1</code>. <span class="lat">~30–80ms</span></span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Formats 2–3 sentence context block. Returns <code>{known: true, context: "Returning guest. Anjali Mehta. Last visit 3 weeks ago, party of 4, window table. Vegetarian, no peanuts."}</code>.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Injects context into the active system prompt; signals agent to use the recall opener path.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent speaks via TTS: <q>Welcome back, Anjali — would you like the same window table this Saturday?</q></span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text">Conversation proceeds. Agent has full guest context throughout, including allergens injected into menu reasoning (see F3).</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">End-of-call: <code>POST /zoronal-webhook</code> with <code>{call_id, transcript, intent, slots, duration}</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">In a transaction: <code>INSERT INTO calls (id, ...) ON CONFLICT (id) DO NOTHING</code> (Zoronal can retry).</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>UPSERT</code> guests row: <code>visit_count = visit_count + 1</code>, <code>last_seen_at = now()</code>, <code>last_visit_summary = $new</code>. Idempotent on phone_e164.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">If <code>intent = 'reservation'</code>: <code>INSERT INTO reservations</code> with <code>guest_id, status='pending', sla_deadline=now()+30min</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Posts Telegram card to manager (kicks off F6).</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Returns <code>200</code> with descriptive body — never <code>500</code>, per CLAUDE.md rule 9.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>calls (INSERT ON CONFLICT DO NOTHING)</li>
+          <li>guests (UPSERT — idempotent on phone_e164)</li>
+          <li>reservations (INSERT if intent=reservation)</li>
+          <li>telegram_messages (log row)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>Lookup &gt;200ms → fall through to F2 (first-time greeting). Don't block the call.</li>
+          <li>Zoronal webhook retry → idempotent via ON CONFLICT.</li>
+          <li>Telegram down → card queued + retried. Not on critical path.</li>
+          <li>DPDP consent → opening line includes "this call may be recorded". Deletion endpoint exists per guest.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F2</span>
+      <h4>New caller → first-time greeting → reservation captured</h4>
+      <span class="uflow-meta">divergent path from F1 · only the differing steps shown</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>Same as F1, but lookup returns no row.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>getGuestContext()</code> returns <code>{known: false}</code>.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent uses neutral first-time opener: <q>Hello and welcome to The Blue Door Cafe — how can I help today?</q></span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text">Conversation proceeds. Agent extracts name and preferences naturally during the call.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">End-of-call extractor (Haiku async, post-webhook): pulls name, allergens, occasions, preferences from transcript with strict zod schema.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>INSERT INTO guests (phone_e164, name, first_seen_at, last_seen_at, visit_count=1, allergens, occasions, ...)</code>. New row.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Reservation + Telegram card flow same as F1 from step 12.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>guests (INSERT — new row, not UPSERT)</li>
+          <li>Same downstream as F1</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>Race on a household number where two people call back-to-back: phone_e164 unique constraint forces UPSERT on second call → name disambiguation handled by next-call confirm.</li>
+          <li>Extractor mis-extracts → manager sees confirmation card before status flips, can correct.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F3</span>
+      <h4>Menu reasoning + allergen-safe filtering at call time</h4>
+      <span class="uflow-meta">target: &lt;500ms tool call to avoid awkward pause</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>Mid-call, caller asks a menu question, mentions an allergen, or has an allergen on their guest profile.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-caller">caller</span><span class="step-text"><q>Do you have anything Jain? I'm allergic to peanuts.</q></span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent invokes <code>menu_query</code> tool with structured filter: <code>{restaurant_id, tags: ['jain'], exclude_allergens: ['peanut'], available_only: true, limit: 5}</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>POST /menu-query</code>. Validates with zod.</span></li>
+      <li><span class="actor a-pg">postgres</span><span class="step-text"><code>SELECT d.* FROM dishes d JOIN dish_tags t ON d.id=t.dish_id WHERE d.restaurant_id=$1 AND t.tag = ANY($2) AND d.is_available=true AND NOT EXISTS (SELECT 1 FROM dish_allergens a WHERE a.dish_id=d.id AND a.allergen = ANY($3)) ORDER BY d.is_special DESC LIMIT $4</code>. <span class="lat">~30–80ms via indexes</span></span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Returns array of <code>{name, price, description, spice_level, tags}</code>.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent phrases: <q>We have three Jain options that are peanut-free — the dal panchmel at ₹420, the paneer lababdar at ₹520, and the…</q></span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text">Continues the conversation; may ask follow-ups (each triggers a new menu_query).</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Post-call: extractor adds 'peanut' to <code>guests.allergens</code> if not already present. Persisted across visits.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>None during call (menu_query is read-only)</li>
+          <li>guests.allergens (UPDATE post-call, deduped)</li>
+          <li>menu_query_log (V1 — for #26 menu intelligence)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>Empty result → strict prompt: <q>We don't currently have that — would you like to hear today's chef specials instead?</q> Never invents.</li>
+          <li>&gt;500ms latency → agent fillers ("let me check that for you") but should be rare with indexes.</li>
+          <li>Wrong allergen tag → manual verification before launch; manager sees allergen on confirm card; kitchen ack required for high-risk.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F4</span>
+      <h4>Off-peak nudge → alternate slot booked</h4>
+      <span class="uflow-meta">target: &lt;100ms per CLAUDE.md spec for check-capacity</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>Caller requests a peak slot at or near capacity.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-caller">caller</span><span class="step-text"><q>Saturday 8 PM, party of 4.</q></span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent invokes <code>check_capacity</code> tool: <code>{restaurant_id, date, time, party_size}</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Counts current confirmed+pending reservations for that slot vs <code>capacity_caps.max_bookings</code>. Computes alternate_slots ±60min with available capacity. Joins against <code>perk_rules</code> by (slot, occupancy_threshold) → attaches perk_offer.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Returns <code>{available: false, alternate_slots: [...], perk_offer: {slot: "18:30", perk: "complimentary dessert"}}</code>.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent: <q>Saturday at 8 is full, but if you're flexible, we have a quieter table at 6:30 — and on the house we'll send a complimentary dessert. Would that work?</q></span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text"><q>Yes, 6:30 works.</q></span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent confirms party and contact, ends call.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">End-of-call: <code>INSERT INTO reservations</code> with <code>booking_time='18:30'</code>, <code>special_requests</code> includes perk note for kitchen.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Telegram card flags the off-peak conversion in the post-call summary so the manager sees the perk obligation.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>reservations (INSERT — alternate slot, perk in special_requests)</li>
+          <li>perk_offer_log (V1 — conversion tracking)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>No alternates have capacity → fall through to F5 (wait-list).</li>
+          <li>check-capacity timeout → fall through to F11 (escalation).</li>
+          <li>Perk margin leak → owner-set cap on perks per day; weekly digest reports cost vs revenue recovered.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F5</span>
+      <h4>Capacity full → wait-list intent capture → cancellation auto-fill</h4>
+      <span class="uflow-meta">manager-driven fill in V0 · 10-min hold on each notify</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>All slots full, no alternate available, caller wants to book.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent: <q>I don't have anything tonight, but I can text you immediately if a table opens up. Would you like that?</q></span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text">Confirms intent, party size, time window.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">End-of-call: <code>INSERT INTO waitlist (restaurant_id, guest_id, phone_e164, requested_date, requested_time, party_size, status='active')</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">[Later] On any reservation cancellation: <code>SELECT</code> oldest matching waitlist row.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Telegram card to manager: <q>Anjali wanted Saturday 8 PM, party of 4. Slot just opened. Send SMS?</q></span></li>
+      <li><span class="actor a-mgr">manager</span><span class="step-text">Taps Send.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>UPDATE waitlist SET status='notified', notified_at=now()</code>. Plivo SMS sent. 10-min hold timer starts.</span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text">Calls back to confirm OR doesn't.</span></li>
+      <li><span class="actor a-cron">cron</span><span class="step-text">Every minute: expires holds &gt;10min, frees the slot, moves to next waitlist row.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>waitlist (INSERT, UPDATE status)</li>
+          <li>plivo_sms_log (INSERT)</li>
+          <li>reservations (INSERT on confirm)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>Race on simultaneous cancellations → sequential 10-min holds, never parallel.</li>
+          <li>Manager doesn't tap → slot stays open. V1 escalates to auto-send.</li>
+          <li>Caller never calls back → cron expires, next waitlist row notified.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F6</span>
+      <h4>Manager confirms via Telegram → guest SMS → reminder cycle</h4>
+      <span class="uflow-meta">sla_deadline 30min from creation · idempotent on double-tap</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>Reservation row inserted with status='pending'.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Posts Telegram card via Bot API: caller name, party, slot, special requests, allergens, perk if any. Inline buttons: Confirm / Decline / Mark VIP / Add Note.</span></li>
+      <li><span class="actor a-tg">telegram</span><span class="step-text">Renders to manager's chat. <code>telegram_message_id</code> stored on the reservation row.</span></li>
+      <li><span class="actor a-mgr">manager</span><span class="step-text">Taps Confirm within sla_deadline.</span></li>
+      <li><span class="actor a-tg">telegram</span><span class="step-text">Webhook to <code>/telegram-callback</code>: <code>{callback_data, message_id, user_id}</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Validates callback signature. <code>UPDATE reservations SET status='confirmed', confirmed_by=$user, confirmed_at=now() WHERE id=$1 AND status='pending'</code> — idempotent on second tap (no-op).</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Plivo SMS to guest: <q>Your table at TBDC is confirmed for Saturday 8 PM, party of 4. Reply CANCEL to free the table.</q></span></li>
+      <li><span class="actor a-tg">telegram</span><span class="step-text">Edits the original card to show ✓ Confirmed by &lt;manager&gt; at &lt;time&gt;.</span></li>
+      <li><span class="actor a-cron">cron</span><span class="step-text">2h before booking_time: <code>SELECT</code> confirmed reservations, dispatch reminder SMS via Plivo. Updates <code>reminder_sent_at</code>.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>reservations (UPDATE status, confirmed_by, confirmed_at, reminder_sent_at)</li>
+          <li>plivo_sms_log (INSERT × 2 — confirm + reminder)</li>
+          <li>telegram_messages (UPDATE — edited card)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>sla_deadline elapsed → cron auto-declines, sends apology SMS to caller.</li>
+          <li>Telegram down → cards queued; on recovery, edits stale; protect with status check before edit.</li>
+          <li>Plivo SMS down → queued + retried; status='confirmed' is the source of truth, SMS delivery is best-effort.</li>
+          <li>Reply CANCEL handler → free the slot, trigger F5 fill.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F7</span>
+      <h4>Missed call → manager-approved SMS recovery</h4>
+      <span class="uflow-meta">manager-tap-Send in V0 · auto-send V1 · dedup 1 SMS per number per 24h</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>End-of-call webhook fires with <code>intent != 'reservation_confirmed'</code> AND <code>duration &gt; 5s</code>.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">End-of-call webhook with no captured booking.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Branches into recovery path. Drafts SMS body based on inferred intent from transcript (Haiku async).</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Telegram card to manager: <q>+91 9XXX hung up after 32s — they seemed to want a Saturday booking. Send recovery SMS?</q> Buttons: Send / Edit / Skip.</span></li>
+      <li><span class="actor a-mgr">manager</span><span class="step-text">Taps Send (or Edit → adjusts body → Send).</span></li>
+      <li><span class="actor a-tg">telegram</span><span class="step-text">Callback to <code>/telegram-callback</code> with <code>action='send_sms'</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Dedup check: <code>SELECT count(*) FROM recovery_attempts WHERE phone_e164=$1 AND created_at &gt; now() - interval '24 hours'</code>. If &gt;0, abort with notice.</span></li>
+      <li><span class="actor a-sms">plivo sms</span><span class="step-text">Sends SMS body to caller's number.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>INSERT INTO recovery_attempts</code>. Telegram card edited to show ✓ Sent.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>recovery_attempts (INSERT)</li>
+          <li>plivo_sms_log (INSERT)</li>
+          <li>telegram_messages (UPDATE)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>Manager doesn't tap within 30min → card auto-archives, marked 'skipped'.</li>
+          <li>Wrong-number caller → 24h dedup prevents repeated spam.</li>
+          <li>Inbound was a misdial → 5s minimum prevents recovery on hangups.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F8</span>
+      <h4>Kitchen /86 → live state → next-call reflection</h4>
+      <span class="uflow-meta">read-at-call-start (no mid-call mutation) · midnight cron auto-resets</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>Kitchen team types <code>/86 lamb chops</code> in the kitchen Telegram chat with Senior bot.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-kit">kitchen</span><span class="step-text">Types <code>/86 lamb chops</code>.</span></li>
+      <li><span class="actor a-tg">telegram</span><span class="step-text">Webhook to <code>/telegram-callback</code> with <code>{message text, chat_id, user}</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Validates chat_id is a known kitchen chat for some restaurant_id (lookup in <code>restaurants.kitchen_telegram_chat_id</code>).</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Parses command. Fuzzy-matches <code>"lamb chops"</code> against <code>dishes.name</code> for that restaurant.</span></li>
+      <li><span class="actor a-pg">postgres</span><span class="step-text"><code>UPDATE dishes SET is_available=false, notes='86 by kitchen at 19:42', notes_updated_at=now() WHERE restaurant_id=$1 AND name ILIKE '%lamb chops%'</code> (returns affected count).</span></li>
+      <li><span class="actor a-tg">telegram</span><span class="step-text">Bot replies in kitchen chat: <q>Got it. Lamb chops marked unavailable. (1 dish updated.)</q></span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text">[Some time later] <q>Do you have lamb chops tonight?</q></span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent invokes menu_query. <code>is_available=true</code> filter excludes lamb chops.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent: <q>I'm sorry, the lamb chops are sold out tonight — would you like to hear what's still available?</q></span></li>
+      <li><span class="actor a-cron">cron</span><span class="step-text">Midnight IST: <code>UPDATE dishes SET is_available=true WHERE notes_updated_at &lt; current_date</code>. Auto-reset.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>dishes (UPDATE is_available, notes, notes_updated_at)</li>
+          <li>telegram_messages (log + reply)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>Race: kitchen sends /86 mid-call. Decision: read is_available at call start, not per-tool-call. Live call sees prior state; next call sees new. Acceptable for V0.</li>
+          <li>Fuzzy match wrong dish → bot's reply names the dish updated; kitchen can /back to undo.</li>
+          <li>Midnight cron failure → stale 86s linger; manual /back required.</li>
+          <li>Multiple matches → bot replies with list and asks which to 86.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F9</span>
+      <h4>FAQ gap → manager taps Add → next caller answered instantly</h4>
+      <span class="uflow-meta">self-improvement engine · weekly aggregation cycle</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>Agent invokes <code>faq_lookup</code> tool but no <code>faq_items</code> match.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-caller">caller</span><span class="step-text"><q>Do you have valet parking?</q></span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent invokes <code>faq_lookup</code> with question text.</span></li>
+      <li><span class="actor a-pg">postgres</span><span class="step-text"><code>SELECT * FROM faq_items WHERE restaurant_id=$1 AND active=true AND (question_canonical ILIKE $2 OR $2 = ANY(question_aliases))</code>. Returns 0 rows.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent escalates politely: <q>Let me have the team confirm — I'll text you in 10 minutes.</q></span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Post-call: <code>INSERT INTO faq_gaps (call_id, restaurant_id, question_text, category_guess, resolved=false)</code>. category_guess via Haiku.</span></li>
+      <li><span class="actor a-cron">cron</span><span class="step-text">Sunday 11 AM IST: aggregates unresolved faq_gaps grouped by category, ranked by frequency.</span></li>
+      <li><span class="actor a-tg">telegram</span><span class="step-text">Weekly digest to manager: <q>14 unresolved questions this week. Top: parking (5), private dining (3). Tap to resolve.</q></span></li>
+      <li><span class="actor a-mgr">manager</span><span class="step-text">Taps "Resolve parking" → form: canonical Q + answer + aliases.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>INSERT INTO faq_items</code>. <code>UPDATE faq_gaps SET resolved=true, resolution='added_to_faq', faq_item_id=&lt;new&gt;</code>.</span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text">[Next inbound] <q>Do you have valet parking?</q></span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">faq_lookup hits the new entry. Agent answers instantly.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>faq_gaps (INSERT, UPDATE resolved)</li>
+          <li>faq_items (INSERT)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>LLM mis-classifies category → manager sees raw question, can override.</li>
+          <li>Owner never taps → monthly nudge with stale count.</li>
+          <li>Duplicate questions → manager picks "Already covered" → links to existing item.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F10</span>
+      <h4>Special occasion → 7-day-out cron → manager-approved SMS</h4>
+      <span class="uflow-meta">cap 1 occasion message per guest per quarter</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p><code>pg_cron</code> daily at 9 AM IST.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-cron">cron</span><span class="step-text">Triggers <code>/occasion-nudge</code> function.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text"><code>SELECT g.* FROM guests g WHERE (occasions-&gt;&gt;'birthday') IS NOT NULL AND to_char(now() + interval '7 days', 'MM-DD') = (occasions-&gt;&gt;'birthday')</code>. Same for anniversary.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Filters out guests with <code>outbound_log</code> entries within last 90 days (anti-spam).</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">For each, drafts personalized SMS (Haiku) using last_visit_summary + occasion type.</span></li>
+      <li><span class="actor a-tg">telegram</span><span class="step-text">Telegram card per guest to manager: <q>Anjali Mehta's anniversary in 7 days. Last visited 3 weeks ago, party of 4. Suggested SMS: '...'. Send / Edit / Skip.</q></span></li>
+      <li><span class="actor a-mgr">manager</span><span class="step-text">Taps Send.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Plivo SMS dispatched. <code>INSERT INTO outbound_log (guest_id, type='occasion', sent_at, body)</code>.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>outbound_log (INSERT)</li>
+          <li>plivo_sms_log (INSERT)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>Hallucinated dates → only persist occasions confirmed during the call (extractor strict). Never auto-tag.</li>
+          <li>Spam fatigue → 90-day cap enforced in SQL filter.</li>
+          <li>Manager skips → respects owner control. Nothing happens.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uflow">
+    <div class="uflow-head">
+      <span class="uflow-num">F11</span>
+      <h4>Manager-as-a-service escalation → callback flow</h4>
+      <span class="uflow-meta">target escalation rate &lt;15% of calls · audit weekly</span>
+    </div>
+    <div class="uflow-trigger"><span class="feat-label">Trigger</span><p>Agent encounters request out of scope: large group (&gt;12), complaint, foreign language, abusive tone, or any pre-prompted "escalate" pattern.</p></div>
+    <ol class="uflow-steps">
+      <li><span class="actor a-caller">caller</span><span class="step-text"><q>I want to book the entire upstairs for 30 people on Saturday.</q></span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent classifier flags <code>out_of_scope:large_group</code>. Pre-prompt directive: do not freelance.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Agent: <q>That's a lovely event — let me have Priya, our manager, call you back in the next 10 minutes. Is this number good for that?</q></span></li>
+      <li><span class="actor a-caller">caller</span><span class="step-text">Confirms callback number.</span></li>
+      <li><span class="actor a-zoronal">zoronal</span><span class="step-text">Ends call gracefully.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">End-of-call: <code>INSERT INTO escalations (call_id, restaurant_id, reason='large_group', summary, callback_phone, status='pending')</code>.</span></li>
+      <li><span class="actor a-fn">edge fn</span><span class="step-text">Telegram alert to manager with click-to-call link (<code>tg://call?phone=...</code>) + summary card.</span></li>
+      <li><span class="actor a-mgr">manager</span><span class="step-text">Taps the call link, dials caller from their phone.</span></li>
+      <li><span class="actor a-mgr">manager</span><span class="step-text">After resolution, taps "Resolved" → <code>UPDATE escalations SET status='resolved', resolved_at=now()</code>.</span></li>
+      <li><span class="actor a-cron">cron</span><span class="step-text">1-hour reminder if status still='pending'. 24-hour final reminder.</span></li>
+    </ol>
+    <div class="uflow-asides">
+      <div class="uflow-aside">
+        <span class="feat-label">Data writes</span>
+        <ul>
+          <li>escalations (INSERT, UPDATE status)</li>
+          <li>telegram_messages (log)</li>
+        </ul>
+      </div>
+      <div class="uflow-aside">
+        <span class="feat-label">Failure modes</span>
+        <ul>
+          <li>Agent over-escalates → escalation rate &gt;15% triggers prompt review.</li>
+          <li>Manager doesn't call back → 1h reminder, then 24h final.</li>
+          <li>Caller calls back themselves → context preserved on guests; agent picks up where it left off.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3>Cross-flow architectural rules</h3>
+  <ul class="list">
+    <li><b>Idempotency.</b> Every webhook handler is idempotent on its primary key. <code>calls</code> uses <code>ON CONFLICT (id) DO NOTHING</code> per CLAUDE.md rule 5. <code>guests</code> UPSERT keyed on <code>phone_e164</code>. <code>reservations</code> dedup via <code>(call_id, booking_date, booking_time)</code>.</li>
+    <li><b>Read-at-call-start.</b> Live call reads guest context, menu state, FAQ corpus once at call start. Mid-call mutations (kitchen /86, manager edits) apply on the next call, not the current one. Avoids race conditions without distributed locks.</li>
+    <li><b>Always 200, never 500.</b> Per CLAUDE.md rule 9 — every webhook returns 200 with descriptive body even on duplicate-retry. Zoronal's retry behavior never poisons the call log.</li>
+    <li><b>Manager-tap-Send wins.</b> Any 1:1 outbound (recovery SMS, occasion SMS, wait-list fill) flows through a Telegram card with Send / Edit / Skip. Buys trust + tuning data + demo polish. Auto-send is a V1 conversion once tuned.</li>
+    <li><b>Async LLM never on critical path.</b> Caller recall context fetch is sync (≤200ms). Every other LLM call (extractor, classifier, summarizer, QA scorer) is post-call async. Never blocks the caller.</li>
+    <li><b>Single source of truth.</b> reservations.status is the source of truth for booking state. SMS delivery is best-effort; Telegram cards reflect status, not own it. Plivo timeouts don't poison the booking.</li>
+    <li><b>Latency budget on tool calls.</b> menu_query &lt;500ms, check_capacity &lt;100ms (CLAUDE.md spec), faq_lookup &lt;200ms. Indexes on (restaurant_id, is_available), (restaurant_id, category), (phone_e164), (booking_date, booking_time) are non-negotiable.</li>
+    <li><b>DPDP compliance.</b> Opening line of every call includes "this call may be recorded for service quality." <code>guests.consent_at</code> tracks. Per-guest deletion endpoint exists. PII never leaves <code>ap-south-1</code>.</li>
+  </ul>
+</section>
+
+</main>
+</div>
+
+<script>
+(function() {
+  var sections = document.querySelectorAll('section.sec');
+  var links = document.querySelectorAll('.sidebar a');
+  function setActive() {
+    var fromTop = window.scrollY + 100;
+    var active = null;
+    sections.forEach(function(sec) {
+      if (sec.offsetTop <= fromTop) active = sec.id;
+    });
+    links.forEach(function(link) {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + active);
+    });
+  }
+  setActive();
+  window.addEventListener('scroll', setActive, { passive: true });
+})();
+</script>
+
+</body>
+</html>

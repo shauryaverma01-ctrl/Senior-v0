@@ -1,5 +1,5 @@
 // zoronal-webhook — receives end-of-call payload from Zoronal.
-// v0.1: log raw payload + persist to calls table, then write reservation + fire Telegram.
+// Always sends Telegram (even for partial captures), so manager never misses a call.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { parseZoronalPayload } from "../_shared/parse-payload.ts";
@@ -10,7 +10,6 @@ import { slaDeadline } from "../_shared/time.ts";
 const SECRET = () => Deno.env.get("ZORONAL_WEBHOOK_SECRET") ?? "";
 
 Deno.serve(async (req) => {
-  // Auth (skip if no secret configured — useful for very first capture)
   const auth = req.headers.get("authorization") ?? "";
   if (SECRET() && auth !== `Bearer ${SECRET()}`) {
     console.warn("webhook_unauthorized", auth.slice(0, 20));
@@ -18,13 +17,8 @@ Deno.serve(async (req) => {
   }
 
   let raw: any = null;
-  try {
-    raw = await req.json();
-  } catch {
-    return new Response("bad_json", { status: 400 });
-  }
+  try { raw = await req.json(); } catch { return new Response("bad_json", { status: 400 }); }
   console.log({ event: "webhook_received", call_id: raw?.call_id ?? "unknown" });
-  console.log({ event: "webhook_raw_preview", preview: JSON.stringify(raw).slice(0, 1500) });
 
   const sb = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -32,124 +26,112 @@ Deno.serve(async (req) => {
   );
 
   const parsed = parseZoronalPayload(raw);
-  if (!parsed || !parsed.call_id) {
+  if (!parsed) {
     console.error("payload_parse_failed");
-    // Still record raw payload so we don't lose the call
     await sb.from("calls").upsert({
       id: raw?.call_id ?? `unknown_${Date.now()}`,
       restaurant_id: "00000000-0000-0000-0000-000000000001",
-      raw_payload: raw,
-      status: "parse_failed",
+      raw_payload: raw, status: "parse_failed",
     }, { onConflict: "id", ignoreDuplicates: true });
     return new Response("ok", { status: 200 });
   }
 
-  // Idempotent: upsert calls keyed on Zoronal call_id
-  const { error: callErr } = await sb.from("calls").upsert(
-    {
-      id: parsed.call_id,
-      restaurant_id: parsed.restaurant_id,
-      caller_number: normalizePhone(parsed.caller_number) ?? parsed.caller_number,
-      started_at: parsed.started_at,
-      ended_at: parsed.ended_at,
-      duration_seconds: parsed.duration_seconds,
-      intent: parsed.intent,
-      status: "completed",
-      summary: parsed.summary,
-      transcript_url: parsed.transcript_url,
-      audio_url: parsed.audio_url,
-      raw_payload: raw,
-    },
-    { onConflict: "id", ignoreDuplicates: true },
-  );
-  if (callErr) console.error("call_upsert_err", callErr);
+  console.log({ event: "parsed_intent", intent: parsed.intent, name: parsed.customer_name, date: parsed.booking_date, time: parsed.booking_time, party: parsed.party_size });
+
+  // Idempotent calls upsert
+  const callerE164 = normalizePhone(parsed.caller_number) ?? parsed.caller_number;
+  const customerE164 = normalizePhone(parsed.customer_phone) ?? parsed.customer_phone;
+  await sb.from("calls").upsert({
+    id: parsed.call_id,
+    restaurant_id: parsed.restaurant_id,
+    caller_number: callerE164,
+    started_at: parsed.started_at,
+    ended_at: parsed.ended_at,
+    duration_seconds: parsed.duration_seconds,
+    intent: parsed.intent,
+    status: "completed",
+    summary: parsed.summary,
+    transcript_url: parsed.transcript_url,
+    audio_url: parsed.audio_url,
+    raw_payload: raw,
+  }, { onConflict: "id", ignoreDuplicates: true });
 
   // Look up restaurant chat_id
-  const { data: rest } = await sb
-    .from("restaurants")
-    .select("telegram_chat_id")
-    .eq("id", parsed.restaurant_id)
-    .single();
+  const { data: rest } = await sb.from("restaurants")
+    .select("telegram_chat_id").eq("id", parsed.restaurant_id).single();
   const chatId = rest?.telegram_chat_id ?? Deno.env.get("TELEGRAM_MANAGER_CHAT_ID")!;
 
-  // Non-reservation intents: just notify manager, no reservation row
-  if (parsed.intent !== "reservation") {
-    if (parsed.intent === "escalation") {
-      await sendPlainMessage(
-        chatId,
-        `<b>⚠️ ESCALATION</b>\nFrom: ${parsed.caller_number}\nSummary: ${parsed.summary ?? "(no summary)"}\nCall back within 1 hour.`,
-      );
+  const isComplete = parsed.intent === "reservation"
+    && parsed.customer_name && parsed.party_size
+    && parsed.booking_date && parsed.booking_time;
+
+  // ── Path A: complete reservation → write row + send buttons
+  if (isComplete) {
+    const { data: existing } = await sb.from("reservations")
+      .select("id").eq("call_id", parsed.call_id).maybeSingle();
+    if (existing?.id) {
+      console.log({ event: "reservation_already_exists", id: existing.id });
+      return new Response("ok", { status: 200 });
     }
-    console.log({ event: "non_reservation", intent: parsed.intent });
-    return new Response("ok", { status: 200 });
-  }
 
-  // Validate minimum reservation fields
-  if (!parsed.customer_name || !parsed.booking_date || !parsed.booking_time || !parsed.party_size) {
-    console.warn("reservation_incomplete", parsed);
-    await sendPlainMessage(
-      chatId,
-      `<b>📋 INCOMPLETE CALL</b>\nFrom: ${parsed.caller_number}\nFields missing — review transcript in Zoronal.`,
-    );
-    return new Response("ok", { status: 200 });
-  }
-
-  // Insert reservation (we already deduped via calls.upsert; re-runs of same call_id won't reinsert)
-  const { data: existing } = await sb
-    .from("reservations")
-    .select("id")
-    .eq("call_id", parsed.call_id)
-    .maybeSingle();
-  if (existing?.id) {
-    console.log({ event: "reservation_already_exists", id: existing.id });
-    return new Response("ok", { status: 200 });
-  }
-
-  const { data: resv, error: resvErr } = await sb
-    .from("reservations")
-    .insert({
+    const { data: resv, error: resvErr } = await sb.from("reservations").insert({
       call_id: parsed.call_id,
       restaurant_id: parsed.restaurant_id,
       customer_name: parsed.customer_name,
-      customer_phone: normalizePhone(parsed.customer_phone) ?? parsed.customer_phone,
+      customer_phone: customerE164,
       party_size: parsed.party_size,
       booking_date: parsed.booking_date,
       booking_time: parsed.booking_time,
       special_requests: parsed.special_requests,
       direct_discount: parsed.direct_discount ?? false,
-      sla_deadline: slaDeadline(parsed.booking_date).toISOString(),
-    })
-    .select()
-    .single();
-  if (resvErr) {
-    console.error("resv_insert_err", resvErr);
-    return new Response("db_err", { status: 500 });
+      sla_deadline: slaDeadline(parsed.booking_date!).toISOString(),
+    }).select().single();
+
+    if (resvErr || !resv) {
+      console.error("resv_insert_err", resvErr);
+      // Still notify manager so the call isn't lost
+      await sendPlainMessage(chatId, `<b>⚠️ DB ERROR ON BOOKING</b>\n${parsed.customer_name} · party ${parsed.party_size} · ${parsed.booking_date} ${parsed.booking_time}\nPhone: ${customerE164 ?? callerE164}\nManager please call back.`);
+      return new Response("db_err", { status: 200 });
+    }
+
+    const text = `<b>NEW BOOKING</b>${parsed.direct_discount ? " · <i>15% direct discount</i>" : ""}
+${escape(resv.customer_name)} · party of ${resv.party_size}
+${resv.booking_date} ${resv.booking_time}
+${escape(customerE164 ?? "(no phone)")}${resv.special_requests ? "\nNotes: " + escape(resv.special_requests) : ""}`;
+
+    const tg = await sendReservationNotification({ chatId, reservationId: resv.id, text });
+    if (tg) {
+      await sb.from("reservations").update({ telegram_message_id: String(tg.message_id) }).eq("id", resv.id);
+    } else {
+      console.error("tg_notification_failed_for", resv.id);
+    }
+    return new Response("ok", { status: 200 });
   }
 
-  const text = formatReservationMessage(resv);
-  const tg = await sendReservationNotification({
-    chatId,
-    reservationId: resv.id,
-    text,
-  });
-  if (tg) {
-    await sb.from("reservations").update({ telegram_message_id: String(tg.message_id) }).eq("id", resv.id);
-  }
+  // ── Path B: partial capture or escalation → ALWAYS notify manager, no DB row
+  const tag = parsed.intent === "escalation" ? "⚠️ ESCALATION"
+    : parsed.intent === "faq" ? "ℹ️ FAQ CALL"
+    : "📋 INCOMPLETE CALL";
+  const lines = [
+    `<b>${tag}</b>`,
+    parsed.customer_name ? `Name: ${escape(parsed.customer_name)}` : "",
+    customerE164 ? `Phone: ${escape(customerE164)}` : (callerE164 ? `Caller: ${escape(callerE164)}` : ""),
+    parsed.party_size ? `Party: ${parsed.party_size}` : "",
+    parsed.booking_date ? `Date: ${parsed.booking_date}` : "",
+    parsed.booking_time ? `Time: ${parsed.booking_time}` : "",
+    parsed.special_requests ? `Notes: ${escape(parsed.special_requests)}` : "",
+    "",
+    `Summary: ${escape(parsed.summary ?? "(no summary)")}`,
+    "",
+    "<i>Manager please call back within the hour.</i>",
+  ].filter(Boolean);
+
+  const sent = await sendPlainMessage(chatId, lines.join("\n"));
+  if (!sent) console.error("tg_plain_send_failed_for_call", parsed.call_id);
 
   return new Response("ok", { status: 200 });
 });
 
-function formatReservationMessage(r: any): string {
-  const discount = r.direct_discount ? " · <i>15% direct discount</i>" : "";
-  const notes = r.special_requests ? `\nNotes: ${escape(r.special_requests)}` : "";
-  return `<b>NEW BOOKING</b>${discount}
-${escape(r.customer_name)} · party of ${r.party_size}
-${r.booking_date} ${r.booking_time}
-${escape(r.customer_phone ?? "(no phone)")}${notes}`.trim();
-}
-
 function escape(s: string): string {
-  return String(s).replace(/[<>&]/g, (c) =>
-    c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;",
-  );
+  return String(s).replace(/[<>&]/g, (c) => c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;");
 }

@@ -1,0 +1,66 @@
+{
+  "version": "v0.1",
+  "description": "Maya voice-agent evaluation rubric. Each dimension is scored independently. The judge returns one object per dimension with {score, max, reasoning}. Overall pass = all critical dimensions pass.",
+  "dimensions": [
+    {
+      "id": "intent_classification",
+      "label": "Intent classification",
+      "max": 1,
+      "critical": true,
+      "description": "Did Maya correctly identify the caller's intent (reservation / faq / escalation / incomplete)?"
+    },
+    {
+      "id": "slot_extraction",
+      "label": "Slot extraction (party size, date, time, name, phone)",
+      "max": 5,
+      "critical": true,
+      "description": "One point per correctly captured slot, where required by the scenario. Missing slots = 0 for that slot. Hallucinated slots (e.g. invented date) = -1 for that slot."
+    },
+    {
+      "id": "ist_handling",
+      "label": "IST date/time normalization",
+      "max": 1,
+      "critical": true,
+      "description": "If date/time were captured, were they correctly normalized to IST (YYYY-MM-DD, HH:MM 24h)? 'tonight' → today's IST date, '8 PM' → 20:00, etc."
+    },
+    {
+      "id": "tool_use",
+      "label": "check_capacity tool use",
+      "max": 1,
+      "critical": true,
+      "description": "If a reservation slot was offered, did Maya call check_capacity *before* confirming? Pass = correct call with correct args. Fail = no call, wrong args, or call after confirmation."
+    },
+    {
+      "id": "escalation_judgement",
+      "label": "Escalation judgement",
+      "max": 1,
+      "critical": true,
+      "description": "If the scenario required escalation (group 9+, complaint, off-card question, etc.), did Maya escalate? If no escalation was required, did she avoid escalating? Both directions matter."
+    },
+    {
+      "id": "no_hallucination",
+      "label": "No hallucination",
+      "max": 1,
+      "critical": true,
+      "description": "Maya must NOT invent: prices, menu items, chef name, ownership, GST, halal status, alcohol prices, parking, hookah, refund policy, catering, total seating, discount amounts. Pass = no invented facts. Fail = any fact stated that isn't in the knowledge card."
+    },
+    {
+      "id": "closure",
+      "label": "Conversation closure",
+      "max": 1,
+      "critical": false,
+      "description": "Did Maya close cleanly with a polite thank-you and emit <call_end ... />? Pass = both. Partial = only one."
+    },
+    {
+      "id": "conversational_quality",
+      "label": "Conversational quality (subjective)",
+      "max": 3,
+      "critical": false,
+      "description": "0=robotic/jarring, 1=functional but stilted, 2=natural Indian-English, 3=warm and crisp. Penalize verbosity, asterisks, list markers being read aloud, repetition."
+    }
+  ],
+  "pass_threshold": {
+    "all_critical_pass": true,
+    "min_overall_percent": 80
+  }
+}
