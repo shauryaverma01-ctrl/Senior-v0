@@ -48,7 +48,9 @@ Deno.serve(async (req) => {
   // Idempotent calls upsert
   const callerE164 = normalizePhone(parsed.caller_number) ?? parsed.caller_number;
   const customerE164 = normalizePhone(parsed.customer_phone) ?? parsed.customer_phone;
-  const guestId = await upsertGuestFromCall(parsed);
+  // Gate the guest bump on first delivery for this call_id; retries reuse existing guest_id.
+  const { data: existingCall } = await sb.from("calls").select("guest_id").eq("id", parsed.call_id).maybeSingle();
+  const guestId: string | null = existingCall ? (existingCall.guest_id ?? null) : await upsertGuestFromCall(parsed);
   await sb.from("calls").upsert({
     id: parsed.call_id,
     restaurant_id: parsed.restaurant_id,

@@ -104,8 +104,7 @@ this script exists; the file is the source of truth.
   11 + section + `0004_voice_vendor_neutral.sql` rename of `zoronal_agent_id`/`zoronal_did`
   to `voice_agent_id`/`voice_did`. End-to-end verified against staging.
   Pending: Zoronal dashboard config to wire pre-call hook → lookup-guest, response.context
-  → {{GUEST_CONTEXT}} template variable in prompt. Follow-up commit needed for replay
-  idempotency (visit_count double-bumps when Zoronal retries the same call_id).
+  → {{GUEST_CONTEXT}} template variable in prompt.
 - **D3 (May 12+) — NEXT.** `0005_restaurant_brain.sql` (menu graph for F3) and `menu-query/`
   Edge Function. Migration numbering shifted up by two (0003/0004 taken by D2 closure).
 - **D4–D11** — see `SENIOR_V0_STRATEGY.html` section 16.
