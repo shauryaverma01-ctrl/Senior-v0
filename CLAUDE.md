@@ -16,6 +16,7 @@ at The Blue Door Cafe (TBDC), Khan Market, Delhi. 5-day build window.
 - `zoronal-webhook/` → end-of-call. Writes calls + reservations rows. Sends Telegram notification.
 - `telegram-callback/` → manager taps Confirm/Decline. Updates reservation.status.
 - `lookup-guest/`  → pre-call tool. Reads `guests` by phone_e164. Returns recall context block. <200ms target. (D1, shipped May 10)
+- `menu-query/`  → during-call tool. Filters `dishes` by tags, allergens, category, spice_level. Returns top matches. <500ms target. (D3, shipped May 11)
 
 ## Hard rules — Claude Code, follow these without exception
 1. Max 150 lines per Edge Function file. Split into _shared/ helpers if longer.
@@ -51,7 +52,7 @@ Customer says "tonight 8 PM" → store as `booking_date=YYYY-MM-DD, booking_time
 where YYYY-MM-DD is the IST date. Never store naive UTC times in `booking_time`.
 
 ## Schema (do not modify without coordinating with the founder)
-See `supabase/migrations/0001_init.sql`, `0002_guests.sql`, `0003_bump_guest.sql` (atomic guest UPSERT function), and `0004_voice_vendor_neutral.sql` (vendor-neutral column rename). Tables:
+See `supabase/migrations/0001_init.sql`, `0002_guests.sql`, `0003_bump_guest.sql` (atomic guest UPSERT function), `0004_voice_vendor_neutral.sql` (vendor-neutral column rename), and `0005_restaurant_brain.sql` (menu graph + query_menu function). Tables:
 - restaurants (id, name, voice_agent_id, voice_did, plivo_did, telegram_chat_id, ...)
 - knowledge_cards (json_content, version, ...)
 - capacity_caps (day_of_week, slot_start, slot_end, max_bookings)
@@ -60,6 +61,11 @@ See `supabase/migrations/0001_init.sql`, `0002_guests.sql`, `0003_bump_guest.sql
                 status, telegram_message_id, guest_id, ...)
 - guests (phone-keyed profile: name, visit_count, tier, allergens, occasions,
           last_visit_summary, ...) — 0002_guests.sql, shipped May 10. Unique on (restaurant_id, phone_e164).
+- dishes (id, restaurant_id, name, category, cuisine, description, price_inr, spice_level,
+          is_available, is_special, ...) — 0005_restaurant_brain.sql, shipped May 11.
+- dish_tags (dish_id, tag) — composite PK. Tags: veg, jain, vegan, gf, halal, signature, mild, spicy, ...
+- dish_allergens (dish_id, allergen) — composite PK. Allergens: peanut, tree_nut, dairy, gluten, ...
+- dish_pairings (dish_id, paired_with_id, pairing_type, notes) — composite PK.
 
 ## What this codebase explicitly does NOT do (yet)
 - Send WhatsApp or SMS to customer (v1)
@@ -105,6 +111,11 @@ this script exists; the file is the source of truth.
   to `voice_agent_id`/`voice_did`. End-to-end verified against staging.
   Pending: Zoronal dashboard config to wire pre-call hook → lookup-guest, response.context
   → {{GUEST_CONTEXT}} template variable in prompt.
-- **D3 (May 12+) — NEXT.** `0005_restaurant_brain.sql` (menu graph for F3) and `menu-query/`
-  Edge Function. Migration numbering shifted up by two (0003/0004 taken by D2 closure).
+- **D3 (May 11) — DONE.** `0005_restaurant_brain.sql` lays in the menu graph (dishes,
+  dish_tags, dish_allergens, dish_pairings) plus the `query_menu` Postgres function.
+  `menu-query/` Edge Function deployed with zod-validated filters (tags, exclude_allergens,
+  category, spice_max, available_only, limit). Verified against 3 seed dishes with the
+  filter matrix: jain-only, peanut-exclusion, multi-allergen exclusion, spice cap, combined
+  tags+spice, and zod rejection of malformed inputs. Pending: TBDC menu seed (~40 dishes
+  via Google Sheets template).
 - **D4–D11** — see `SENIOR_V0_STRATEGY.html` section 16.
