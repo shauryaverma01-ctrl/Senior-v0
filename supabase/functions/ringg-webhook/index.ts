@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
   const customerE164 = normalizePhone(parsed.customer_phone) ?? parsed.customer_phone;
   const { data: existingCall } = await sb.from("calls").select("guest_id").eq("id", parsed.call_id).maybeSingle();
   const guestId: string | null = existingCall ? (existingCall.guest_id ?? null) : await upsertGuestFromCall(parsed);
-  await sb.from("calls").upsert({
+  const { error: callsErr } = await sb.from("calls").upsert({
     id: parsed.call_id,
     restaurant_id: parsed.restaurant_id,
     caller_number: callerE164,
@@ -68,7 +68,18 @@ Deno.serve(async (req) => {
     audio_url: parsed.audio_url,
     raw_payload: raw,
     guest_id: guestId,
-  }, { onConflict: "id", ignoreDuplicates: true });
+    key_points: parsed.key_points ?? null,
+    action_items: parsed.action_items ?? null,
+    call_cost: parsed.call_cost ?? null,
+    classification: parsed.classification ?? null,
+    guest_brief: parsed.guest_brief ?? null,
+    kitchen_note: parsed.kitchen_note ?? null,
+    language: parsed.language ?? null,
+  }, { onConflict: "id" });
+  if (callsErr) {
+    console.error("ringg_calls_upsert_err", callsErr);
+    return new Response("calls_upsert_failed", { status: 200 });
+  }
 
   const { data: rest } = await sb.from("restaurants")
     .select("telegram_chat_id").eq("id", parsed.restaurant_id).single();
@@ -106,10 +117,35 @@ Deno.serve(async (req) => {
       return new Response("db_err", { status: 200 });
     }
 
-    const text = `<b>NEW BOOKING</b>${parsed.direct_discount ? " · <i>15% direct discount</i>" : ""}
-${escape(resv.customer_name)} · party of ${resv.party_size}
-${resv.booking_date} ${resv.booking_time}
-${escape(customerE164 ?? "(no phone)")}${resv.special_requests ? "\nNotes: " + escape(resv.special_requests) : ""}`;
+    const gh = parsed.guest_history;
+    const discountLine = parsed.direct_discount ? "\n🎟 <i>15% direct line discount</i>" : "";
+
+    // Guest history block — only for returning guests
+    const historyBlock = gh?.known
+      ? `\n↩️ Visit #${gh.visit_count ?? "?"} · ${gh.tier ?? ""}` +
+        (gh.last_visit_summary ? `\n<i>Last: ${escape(gh.last_visit_summary.slice(0, 80))}${gh.last_visit_summary.length > 80 ? "…" : ""}</i>` : "")
+      : "";
+
+    const allergenLine = parsed.allergens && parsed.allergens.length > 0
+      ? `\n⚠️ <b>Allergens:</b> ${escape(parsed.allergens.join(", "))}` : "";
+    const dislikeLine = parsed.dislikes && parsed.dislikes.length > 0
+      ? `\n🚫 <b>Avoid:</b> ${escape(parsed.dislikes.join(", "))}` : "";
+    const seating = (parsed.preferences as any)?.seating;
+    const seatingLine = seating ? `\n🪑 <b>Seating:</b> ${escape(seating)}` : "";
+    const occasionEntries = Object.entries(parsed.occasions ?? {});
+    const occasionLine = occasionEntries.length > 0
+      ? `\n🎉 <b>Occasion:</b> ${escape(occasionEntries.map(([k, v]) => `${k} (${v})`).join(", "))}` : "";
+    const briefLine = parsed.guest_brief ? `\n\n💬 ${escape(parsed.guest_brief)}` : "";
+    const kitchenLine = parsed.kitchen_note ? `\n👨‍🍳 <b>Kitchen:</b> ${escape(parsed.kitchen_note)}` : "";
+    const actionLine = parsed.action_items && parsed.action_items.length > 0
+      ? `\n\n<b>Action items:</b>\n${parsed.action_items.map((a: string) => `• ${escape(a)}`).join("\n")}` : "";
+    const summaryLine = parsed.summary ? `\n\n<i>${escape(parsed.summary)}</i>` : "";
+
+    const text = `🍽 <b>NEW BOOKING</b>${discountLine}
+${historyBlock}
+👤 ${escape(resv.customer_name ?? "Guest")} · party of ${resv.party_size}
+📅 ${resv.booking_date} · ${resv.booking_time}
+📞 ${escape(customerE164 ?? "(no phone)")}${occasionLine}${allergenLine}${dislikeLine}${seatingLine}${briefLine}${kitchenLine}${actionLine}${summaryLine}`;
 
     const tg = await sendReservationNotification({ chatId, reservationId: resv.id, text });
     if (tg) {
@@ -123,16 +159,18 @@ ${escape(customerE164 ?? "(no phone)")}${resv.special_requests ? "\nNotes: " + e
   const tag = parsed.intent === "escalation" ? "⚠️ ESCALATION"
     : parsed.intent === "faq" ? "ℹ️ FAQ CALL"
     : "📋 INCOMPLETE CALL";
+  const incActionLine = parsed.action_items && parsed.action_items.length > 0
+    ? `\n\n<b>Action items:</b>\n${parsed.action_items.map((a: string) => `• ${escape(a)}`).join("\n")}` : "";
   const lines = [
     `<b>${tag}</b>`,
-    parsed.customer_name ? `Name: ${escape(parsed.customer_name)}` : "",
-    customerE164 ? `Phone: ${escape(customerE164)}` : (callerE164 ? `Caller: ${escape(callerE164)}` : ""),
-    parsed.party_size ? `Party: ${parsed.party_size}` : "",
-    parsed.booking_date ? `Date: ${parsed.booking_date}` : "",
-    parsed.booking_time ? `Time: ${parsed.booking_time}` : "",
-    parsed.special_requests ? `Notes: ${escape(parsed.special_requests)}` : "",
+    parsed.customer_name ? `👤 ${escape(parsed.customer_name)}` : "",
+    customerE164 ? `📞 ${escape(customerE164)}` : (callerE164 ? `📞 ${escape(callerE164)}` : ""),
+    parsed.party_size ? `👥 Party of ${parsed.party_size}` : "",
+    parsed.booking_date ? `📅 ${parsed.booking_date}${parsed.booking_time ? " · " + parsed.booking_time : ""}` : "",
+    parsed.special_requests ? `📝 ${escape(parsed.special_requests)}` : "",
+    incActionLine,
     "",
-    `Summary: ${escape(parsed.summary ?? "(no summary)")}`,
+    parsed.summary ? `<i>${escape(parsed.summary)}</i>` : "<i>(no summary)</i>",
     "",
     "<i>Manager please call back within the hour.</i>",
   ].filter(Boolean);

@@ -2,6 +2,7 @@
 // All Zoronal-specific keys live here. Business code consumes InternalCallEvent only.
 
 import type { InternalCallEvent } from "./types.ts";
+import { istDateString, istDayOfWeek } from "./time.ts";
 
 const BLUE_DOOR_RESTAURANT_ID = "00000000-0000-0000-0000-000000000001";
 
@@ -70,15 +71,14 @@ function normalizeIntent(rawIntent: any, summary?: string, qual?: any): string {
 }
 
 // ── Date normalization — handles many natural forms ─────────────────
-const TODAY_IST = "2026-05-08"; // anchor date — update via redeploy
 const WEEKDAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
 const MONTHS = ["january","february","march","april","may","june","july","august","september","october","november","december"];
 
 function todayParts(): { y: number; m: number; d: number; dow: number } {
-  const [y, m, d] = TODAY_IST.split("-").map(Number);
-  // Day-of-week from anchor (Friday May 8, 2026 = dow 5)
-  const anchor = new Date(`${TODAY_IST}T00:00:00Z`);
-  return { y, m, d, dow: anchor.getUTCDay() };
+  const today = istDateString(); // dynamic — always today in IST
+  const [y, m, d] = today.split("-").map(Number);
+  const dow = WEEKDAYS.indexOf(istDayOfWeek(today));
+  return { y, m, d, dow };
 }
 
 function fmtDate(y: number, m: number, d: number): string {
@@ -102,7 +102,7 @@ export function normalizeDate(input: any): string | undefined {
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
   // "today" / "tonight"
-  if (/^(today|tonight)\b/.test(s)) return TODAY_IST;
+  if (/^(today|tonight)\b/.test(s)) return istDateString();
   // "tomorrow"
   if (/\btomorrow\b/.test(s)) return addDays(t.y, t.m, t.d, 1);
   // "day after tomorrow"
@@ -139,7 +139,7 @@ export function normalizeDate(input: any): string | undefined {
     const day = parseInt(ordinal[1], 10);
     if (day >= 1 && day <= 31) {
       const candidate = fmtDate(t.y, t.m, day);
-      if (candidate >= TODAY_IST) return candidate;
+      if (candidate >= istDateString()) return candidate;
       // past date this month → assume next month
       const nextM = t.m === 12 ? 1 : t.m + 1;
       const nextY = t.m === 12 ? t.y + 1 : t.y;
