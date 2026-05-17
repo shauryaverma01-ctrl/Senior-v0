@@ -27,3 +27,8 @@ supabase/.temp/
 *.log
 npm-debug.log*
 .claude/
+
+# Screenshots + R session junk
+Screenshot*.png
+.Rhistory
+**/.Rhistory

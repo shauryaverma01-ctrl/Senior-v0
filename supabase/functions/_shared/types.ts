@@ -8,10 +8,18 @@ export interface InternalCallEvent {
   started_at: string;
   ended_at: string;
   duration_seconds: number;
-  intent: "reservation" | "faq" | "escalation" | "incomplete" | string;
+  intent:
+    | "reservation"
+    | "faq"
+    | "vendor_offer"      // v6.2: supplier pitching, captured into vendor_leads
+    | "escalation"
+    | "incomplete"
+    | string;
   summary?: string;
   transcript_url?: string;
   audio_url?: string;
+
+  // reservation fields
   customer_name?: string;
   customer_phone?: string;
   party_size?: number;
@@ -19,6 +27,12 @@ export interface InternalCallEvent {
   booking_time?: string; // HH:MM (24h)
   special_requests?: string;
   direct_discount?: boolean;
+
+  // v6.2 — vendor capture (intent=vendor_offer)
+  vendor_name?: string;
+  vendor_category?: string;     // "Milk · daily supply", "Premium spices", ...
+  vendor_offer?: string;        // free-form pitch
+  vendor_price?: string;        // free-form ("₹52/L", "market+5%", ...)
 }
 
 export interface CapacityResponse {

@@ -35,6 +35,12 @@ export function parseZoronalPayload(raw: any): InternalCallEvent | null {
     booking_time: normalizeTime(timeRaw),
     special_requests: nonEmpty(fields.special_requests),
     direct_discount: detectDiscount(fields, summary),
+
+    // v6.2 — vendor capture (intent=vendor_offer)
+    vendor_name: nonEmpty(fields.vendor_name),
+    vendor_category: nonEmpty(fields.vendor_category) ?? nonEmpty(fields.category),
+    vendor_offer: nonEmpty(fields.vendor_offer) ?? nonEmpty(fields.offer),
+    vendor_price: nonEmpty(fields.vendor_price) ?? nonEmpty(fields.price),
   };
 }
 
@@ -62,10 +68,37 @@ function extractCaller(raw: any): string {
 }
 
 function normalizeIntent(rawIntent: any, summary?: string, qual?: any): string {
+  // v6.2: Maya emits canonical intent strings explicitly. Trust them first to
+  // keep dashboard ↔ webhook in lockstep.
+  const explicit = String(rawIntent ?? "").trim().toLowerCase();
+  if (explicit === "vendor_offer" || explicit === "reservation"
+      || explicit === "faq" || explicit === "escalation") {
+    return explicit;
+  }
+
   const s = `${rawIntent ?? ""} ${summary ?? ""}`.toLowerCase();
   if (/complaint|bad experience|cancel my|cancellation request|modify my booking/.test(s)) return "escalation";
   if (qual?.booking_was_done_successfully === true) return "reservation";
   if (/reservation|booking|table for|book a table/.test(s)) return "reservation";
+
+  // v6.2 fallback — only used when Maya didn't tag explicitly. Logged so
+  // any unrecognized vendor calls are visible in Supabase function logs.
+  // Covers English vendor keywords + Hindi/Hinglish ones common in Delhi
+  // supplier pitches (thok / mandi / saamaan / doodh / paneer / sabzi /
+  // murgi / masale / supply karta/karte hain / company se / sample bhej).
+  const vendorEn = /(supplier|vendor|wholesale|bulk\s*rate|supply|distribut|product to sell|sample to send)/;
+  // Services-vendor keywords (websites, marketing, SaaS, etc.) — caught the
+  // 2026-05-16 21:47 test call where a website agency was mis-classified as
+  // reservation. These trigger only if the message also has restaurant /
+  // pitch / offer language nearby, to avoid catching customers asking
+  // about the restaurant's own services (e.g. "do you have a website?").
+  const servicesEn = /(marketing\s*(agency|services|company)|website\s*(for\s*restaurants|development|design)|app\s*(for\s*restaurants|development)|seo\s*(services|agency)|branding\s*(agency|services)|consult(ing|ancy|ant)\s*(for|to)\s*restaurants?|we\s*(work|help)\s*with\s*restaurants?|our\s*(agency|company)\s*does|pos\s*system|billing\s*software|loyalty\s*platform|photography\s*services|menu\s*shoot|pest\s*control\s*services|cleaning\s*services)/i;
+  const vendorHi = /(thok|mandi|saamaan\s*(bhej|dena|denge)|doodh\s*(supply|wholesale)|paneer\s*(supply|wholesale)|murgi\s*(supply|wholesale)|sabzi\s*(supply|wholesale)|masale?\s*(supply|wholesale)|company\s*se|distributor\s*h(ain|oon|ai)|supply\s*kart(a|e|i)\s*h(oon|ain)|sample\s*bhej|rate\s*bata|restaurants?\s*ke\s*liye\s*(banate|karte)|aapki\s*(website|app|branding))/i;
+  if (vendorEn.test(s) || servicesEn.test(s) || vendorHi.test(s)) {
+    console.log({ event: "unrecognized_intent_fallback", classified: "vendor_offer", raw: explicit });
+    return "vendor_offer";
+  }
+
   if (/(faq|enquiry|inquiry|question about|hours\?|menu\?)/.test(s)) return "faq";
   return "incomplete";
 }

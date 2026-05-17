@@ -1,16 +1,19 @@
 // zoronal-webhook — receives end-of-call payload from Zoronal.
 // Always sends Telegram (even for partial captures), so manager never misses a call.
 //
-// TODO(vendor-abstraction): when a second voice vendor lands, extract the post-parse
-// business logic below — calls upsert, upsertGuestFromCall, reservations insert,
-// Telegram notification — into _shared/handle-call-event.ts so both webhooks share it.
-// The seam is everything after `parseZoronalPayload(raw)` returns. See CLAUDE.md
-// "Voice Vendor Abstraction" for the principle.
+// v6.2 (2026-05-16): adds one branch — vendor_offer intent writes into
+// vendor_leads + plain Telegram. Reservation / FAQ / escalation / incomplete
+// paths unchanged. Customer calls stay with Maya (no transfer).
+//
+// TODO(vendor-abstraction): ringg-webhook needs the same vendor_offer branch
+// when ready. After both are proven, extract post-parse logic into
+// _shared/handle-call-event.ts. See CLAUDE.md "Voice Vendor Abstraction".
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { parseZoronalPayload } from "../_shared/parse-payload.ts";
 import { sendReservationNotification, sendPlainMessage } from "../_shared/telegram.ts";
 import { upsertGuestFromCall } from "../_shared/guests.ts";
+import { insertVendorLead, formatVendorTelegram } from "../_shared/leads.ts";
 import { normalizePhone } from "../_shared/phone.ts";
 import { slaDeadline } from "../_shared/time.ts";
 
@@ -71,6 +74,14 @@ Deno.serve(async (req) => {
   const { data: rest } = await sb.from("restaurants")
     .select("telegram_chat_id").eq("id", parsed.restaurant_id).single();
   const chatId = rest?.telegram_chat_id ?? Deno.env.get("TELEGRAM_MANAGER_CHAT_ID")!;
+
+  // v6.2 ── Path C: vendor pitch → vendor_leads + plain Telegram
+  if (parsed.intent === "vendor_offer") {
+    await insertVendorLead(sb, parsed, callerE164);
+    const sent = await sendPlainMessage(chatId, formatVendorTelegram(parsed, callerE164));
+    if (!sent) console.error("tg_vendor_send_failed_for_call", parsed.call_id);
+    return new Response("ok", { status: 200 });
+  }
 
   const isComplete = parsed.intent === "reservation"
     && parsed.customer_name && parsed.party_size

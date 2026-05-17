@@ -1,0 +1,201 @@
+{
+  "status": "completed",
+  "call_id": "0f25e24e-4cae-4fb2-84fa-e198cfe17952",
+  "agent_id": "1a968174-828a-435b-8e83-e37b61b5de91",
+  "call_sid": "163fc003-f3dd-451a-93d2-f33d34892725",
+  "call_cost": 12,
+  "call_type": "outbound",
+  "called_on": "2026-05-12T23:37:56.883124Z",
+  "to_number": "+919971575110",
+  "agent_name": "Maya - TBDC Voice",
+  "created_at": "2026-05-12T23:37:56.886802Z",
+  "event_type": "call_completed",
+  "sub_status": "ACCEPTED",
+  "transcript": [
+    {
+      "bot": "Hi aaryak garg ! This is Maya from The Blue Door Cafe in Khan Market. I'm calling to help you with your reservation - is this a good time to chat?",
+      "timestamp": "2026-05-12T23:38:05.379+00:00",
+      "message_id": "4da4a21c-7b28-456d-9c96-eb6df987cafe"
+    },
+    {
+      "user": "Yeah sure, so",
+      "timestamp": "2026-05-12T23:38:15.867+00:00",
+      "message_id": "1767984"
+    },
+    {
+      "user": "\u092f\u093e\u0930 \u092e\u0948\u0902 \u091a\u093e\u0939\u0924\u093e \u0939\u0942\u0902 \u0915\u093f",
+      "timestamp": "2026-05-12T23:38:17.356+00:00",
+      "message_id": "1768449"
+    },
+    {
+      "user": "\u092c\u091c\u0947 \u0915\u093e slot \u0915\u0930 \u0926\u094b \u0915\u0932 \u0915\u093e.",
+      "timestamp": "2026-05-12T23:38:19.358+00:00",
+      "message_id": "1769046"
+    },
+    {
+      "bot": "Bilkul, aaryak garg. Kitne logon ke liye table chahiye kal?",
+      "timestamp": "2026-05-12T23:38:20.696+00:00",
+      "message_id": "8f50b3c5-ec3a-4a46-b20e-b0914dc4d2c7"
+    },
+    {
+      "user": "\u091a\u093e\u0930 \u0932\u094b\u0917\u094b\u0902 \u0915\u0947 \u0932\u093f\u090f table \u091a\u093e\u0939\u093f\u090f \u0924\u0940\u0928 \u092c\u091c\u0947 \u0915\u0940 \u0915\u0932.",
+      "timestamp": "2026-05-12T23:38:27.198+00:00",
+      "message_id": "1771199"
+    },
+    {
+      "bot": "Theek hai, kal teen baje, chaar logon ke liye table ho jayegi. Koi special occasion hai ya bas casual milna hai?",
+      "timestamp": "2026-05-12T23:38:31.677+00:00",
+      "message_id": "907dad05-09e8-4f44-a296-9e62a373ae82"
+    },
+    {
+      "user": "\u0928\u0939\u0940\u0902 \u092c\u093e\u0915\u0940 \u0915\u0941\u091b \u0928\u0939\u0940\u0902 \u0939\u0948. \u0906\u092a \u092c\u0938 book \u0915\u0930 \u0926\u0940\u091c\u093f\u090f.",
+      "timestamp": "2026-05-12T23:38:40.879+00:00",
+      "message_id": "1773754"
+    },
+    {
+      "bot": "Bilkul, note kar liya. Kya kisi ko dietary preference ya allergy ka dhyaan rakhna hai?",
+      "timestamp": "2026-05-12T23:38:42.366+00:00",
+      "message_id": "50e7da1f-c625-4451-9154-b6d26f2a894a"
+    },
+    {
+      "user": "\u0928\u0939\u0940\u0902, \u092c\u0938 book \u0915\u0930 \u0926\u0940\u091c\u093f\u090f \u0938\u0940\u0927\u093e.",
+      "timestamp": "2026-05-12T23:38:48.847+00:00",
+      "message_id": "1775323"
+    },
+    {
+      "user": "Please book \u0915\u0930 \u0926\u0940\u091c\u093f\u090f.",
+      "timestamp": "2026-05-12T23:38:50.256+00:00",
+      "message_id": "1775758"
+    },
+    {
+      "bot": "Theek hai, ek last cheez - aapko seating ka koi preference hai? Outdoor seating nahi hai, lekin doosre floor par smoking area hai.",
+      "timestamp": "2026-05-12T23:38:51.722+00:00",
+      "message_id": "67c89400-8c6d-4965-9127-f93be80c07cd"
+    },
+    {
+      "user": "\u0939\u093e\u0902 sure. So seating \u0915\u093e by window.",
+      "timestamp": "2026-05-12T23:39:02.975+00:00",
+      "message_id": "1778316"
+    },
+    {
+      "bot": "Note kar",
+      "timestamp": "2026-05-12T23:39:04.475+00:00",
+      "message_id": "52335e37-6634-44eb-9e14-17ffb1a9adc3"
+    },
+    {
+      "user": "Near window",
+      "timestamp": "2026-05-12T23:39:04.897+00:00",
+      "message_id": "1779156"
+    },
+    {
+      "bot": "Bilkul, near window seating note kar liya. Toh aapka booking hai - chaar log, kal, teen baje, near window, aaryak garg ke naam par. Sab theek hai?",
+      "timestamp": "2026-05-12T23:39:05.846+00:00",
+      "message_id": "da00920f-3480-4617-a814-0710349dc2a5"
+    },
+    {
+      "user": "All good.",
+      "timestamp": "2026-05-12T23:39:15.301+00:00",
+      "message_id": "1781357"
+    },
+    {
+      "bot": "Aapka table reserve ho gaya, aaryak garg. Manager aapko jaldi call karega. See you tomorrow!",
+      "timestamp": "2026-05-12T23:39:17.134+00:00",
+      "message_id": "b5ac0fed-32fd-40b4-82ed-8c965322e946"
+    }
+  ],
+  "version_id": "eaa8495d-3d70-4d47-a596-68365739fa1b",
+  "from_number": "+912268095634",
+  "retry_count": 0,
+  "bulk_list_id": null,
+  "version_slug": "v1",
+  "workspace_id": "95d25f01-ce48-4c40-9671-ff2dc2a23300",
+  "call_duration": 78.468158,
+  "recording_url": null,
+  "tool_call_logs": [
+    {
+      "tool_name": "greetings",
+      "tool_type": "api_call",
+      "latency_ms": 50,
+      "tool_phase": "pre_call",
+      "executed_at": "2026-05-12T23:37:55.978960+00:00",
+      "status_code": 200,
+      "error_details": null,
+      "response_data": {
+        "date": "2026-05-13",
+        "time": "05:07:55.975540",
+        "epoch": 1778629075,
+        "greeting": "Good Morning",
+        "is_weekend": false,
+        "day_of_week": "Wednesday",
+        "outro_greeting": ""
+      },
+      "request_params": {
+        "url": "https://prod-api.ringg.ai/ca/api/v0/external_hook/time_ist_to_greetings",
+        "body": null,
+        "method": "GET",
+        "headers": {},
+        "query_params": {}
+      }
+    },
+    {
+      "tool_name": "check_capacity",
+      "tool_type": "api_call",
+      "latency_ms": 1962.42,
+      "tool_phase": "on_call",
+      "executed_at": "2026-05-12T23:38:30.670662+00:00",
+      "status_code": 200,
+      "error_details": null,
+      "response_data": {
+        "ok": true,
+        "available": true,
+        "alternate_slots": []
+      },
+      "request_params": {
+        "url": "https://xslbbnbsyuklayewuhsc.supabase.co/functions/v1/check-capacity",
+        "body": {
+          "date": "2026-05-14",
+          "time": "15:00",
+          "party_size": "4",
+          "restaurant_id": "00000000-0000-0000-0000-000000000001"
+        },
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzbGJibmJzeXVrbGF5ZXd1aHNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNjk4MTYsImV4cCI6MjA5Mzc0NTgxNn0._a_RzfMabBmk-KMuOOX-MY6RN7lczDKCPj4PrVjpFvY"
+        },
+        "query_params": {},
+        "function_args": {
+          "date": "2026-05-14",
+          "time": "15:00",
+          "party_size": "4"
+        }
+      }
+    },
+    {
+      "tool_name": "end_call",
+      "tool_type": "end_call",
+      "latency_ms": 6222.37,
+      "tool_phase": "on_call",
+      "executed_at": "2026-05-12T23:39:23.011419+00:00",
+      "status_code": 200,
+      "error_details": null,
+      "response_data": {
+        "success": true,
+        "call_ended": true
+      },
+      "request_params": {
+        "function_args": {
+          "final_message": "Aapka table reserve ho gaya, aaryak garg. Manager aapko jaldi call karega. See you tomorrow!"
+        }
+      }
+    }
+  ],
+  "custom_args_values": {
+    "callee_name": "aaryak garg",
+    "mobile_number": "+919971575110"
+  },
+  "user_message_count": 10,
+  "agent_message_count": 8,
+  "version_description": null,
+  "first_utterance_seconds": 0.831956,
+  "overall_latency_seconds": 0.920944
+}
