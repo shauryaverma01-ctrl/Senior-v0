@@ -13,7 +13,11 @@ Deno.serve(async (req) => {
 
   const cq = upd?.callback_query;
   if (!cq) {
-    // Not a callback (might be a regular message). ACK and ignore.
+    // Not a callback (might be a regular message). Log chat for diagnostics, then ACK and ignore.
+    const msg = upd?.message ?? upd?.edited_message ?? upd?.channel_post ?? upd?.my_chat_member;
+    if (msg?.chat) {
+      console.log({ event: "tg_non_callback", chat_id: msg.chat.id, chat_type: msg.chat.type, chat_title: msg.chat.title ?? msg.chat.first_name, text: msg.text?.slice(0, 80) });
+    }
     return new Response("ok", { status: 200 });
   }
 

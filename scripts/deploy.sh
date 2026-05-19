@@ -17,6 +17,9 @@ supabase functions deploy telegram-callback --no-verify-jwt
 echo "Deploying lookup-guest..."
 supabase functions deploy lookup-guest --no-verify-jwt
 
+echo "Deploying escalate-call..."
+supabase functions deploy escalate-call --no-verify-jwt
+
 echo ""
 echo "All functions deployed."
 echo ""
@@ -25,3 +28,4 @@ echo "  check-capacity:    https://${SUPABASE_PROJECT_REF:-xslbbnbsyuklayewuhsc}
 echo "  zoronal-webhook:   https://${SUPABASE_PROJECT_REF:-xslbbnbsyuklayewuhsc}.supabase.co/functions/v1/zoronal-webhook"
 echo "  telegram-callback: https://${SUPABASE_PROJECT_REF:-xslbbnbsyuklayewuhsc}.supabase.co/functions/v1/telegram-callback"
 echo "  lookup-guest:      https://${SUPABASE_PROJECT_REF:-xslbbnbsyuklayewuhsc}.supabase.co/functions/v1/lookup-guest"
+echo "  escalate-call:     https://${SUPABASE_PROJECT_REF:-xslbbnbsyuklayewuhsc}.supabase.co/functions/v1/escalate-call"
