@@ -56,11 +56,17 @@ export async function getGuestContext(
 // Tone: terse, factual. Let the model phrase the warmth.
 function formatContextLine(g: Guest): string {
   const parts: string[] = [];
-  parts.push(`Returning guest. ${g.name ?? "(name on file unknown)"}.`);
+  parts.push(`Returning guest. ${g.name ?? "(name on file unknown)"}. Visits: ${g.visit_count}.`);
   if (g.last_visit_summary) parts.push(`Last visit: ${g.last_visit_summary}.`);
   if (g.allergens && g.allergens.length > 0) {
-    parts.push(`Allergens: ${g.allergens.join(", ")}.`);
+    parts.push(`ALLERGENS ON FILE: ${g.allergens.join(", ")} — inform kitchen automatically.`);
   }
+  const prefs = g.preferences as Record<string, unknown> | null;
+  if (prefs?.dietary) parts.push(`Dietary: ${prefs.dietary}.`);
+  if (prefs?.seating) parts.push(`Prefers: ${prefs.seating} seating.`);
+  const occ = g.occasions as Record<string, unknown> | null;
+  const occKeys = occ ? Object.keys(occ) : [];
+  if (occKeys.length > 0) parts.push(`Past occasions: ${occKeys.join(", ")}.`);
   if (g.tier === "vip") parts.push("VIP — greet warmly, offer the best available table.");
   return parts.join(" ");
 }
@@ -78,6 +84,9 @@ export async function upsertGuestFromCall(
     p_phone_e164: phone,
     p_name: ev.customer_name ?? null,
     p_summary: ev.summary ?? null,
+    p_allergens: ev.allergens && ev.allergens.length > 0 ? ev.allergens : null,
+    p_preferences: ev.preferences && Object.keys(ev.preferences).length > 0 ? ev.preferences : null,
+    p_occasions: ev.occasions && Object.keys(ev.occasions).length > 0 ? ev.occasions : null,
   });
   if (error) {
     console.error("bump_guest_err", error);
