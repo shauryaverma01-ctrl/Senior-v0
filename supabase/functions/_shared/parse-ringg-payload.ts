@@ -35,7 +35,15 @@ export function parseRinggPayload(raw: any): InternalCallEvent | null {
 
   // Mine tool_call_logs for booking data + guest history.
   const toolLogs: any[] = Array.isArray(raw.tool_call_logs) ? raw.tool_call_logs : [];
-  const capacityCall = toolLogs.find((t) => t?.tool_name === "check_capacity");
+  // A caller often refines the booking (changes party size / time) and re-checks capacity,
+  // so there can be several check_capacity calls. Using the FIRST (via .find) grabbed the
+  // abandoned attempt — e.g. an early "party of 3, no time yet" that returned bad_input —
+  // leaving booking_time empty and dropping a real, confirmed booking. Use the LAST call
+  // that came back available (the slot Maya actually confirmed); fall back to the last
+  // attempt overall if none succeeded.
+  const capacityCalls = toolLogs.filter((t) => t?.tool_name === "check_capacity");
+  const capacityCall = [...capacityCalls].reverse().find((t) => t?.response_data?.available === true)
+    ?? capacityCalls[capacityCalls.length - 1];
   const capacityBody = capacityCall?.request_params?.body ?? capacityCall?.request_params?.function_args ?? {};
   const capacityOk = capacityCall?.response_data?.available === true;
   const endCallLog = toolLogs.find((t) => t?.tool_name === "end_call");
@@ -73,9 +81,12 @@ export function parseRinggPayload(raw: any): InternalCallEvent | null {
     last_interaction: callerData.last_interaction,
   } : { known: false };
 
-  const bookingDate = normalizeDate(capacityBody.date);
-  const bookingTime = normalizeTime(capacityBody.time);
-  const partySize = toInt(capacityBody.party_size);
+  // Prefer the confirmed check_capacity slot; fall back to the LLM's client_analysis
+  // booking fields when the tool body is empty (e.g. tool not called, or empty time).
+  const ca = raw.client_analysis ?? {};
+  const bookingDate = normalizeDate(capacityBody.date) ?? normalizeDate(ca.booking_date);
+  const bookingTime = normalizeTime(capacityBody.time) ?? normalizeTime(ca.booking_time);
+  const partySize = toInt(capacityBody.party_size) ?? toInt(ca.party_size);
 
   // Prefer Ringg's post-call structured fields.
   // platform_analysis has the AI-generated summary + classification.
