@@ -193,9 +193,13 @@ Deno.serve(async (req) => {
     return new Response("ok", { status: 200 });
   }
 
+  // A bookable slot = party + date + time. customer_name is intentionally NOT required:
+  // callers often book without giving a name (and inbound calls carry no callee_name),
+  // yet the booking is still confirmed on the call. Requiring a name here previously
+  // dropped real reservations to the "Incomplete" card AND skipped the DB insert. The
+  // card + table both tolerate a missing name (display falls back to "Guest").
   const isComplete = parsed.intent === "reservation"
-    && parsed.customer_name && parsed.party_size
-    && parsed.booking_date && parsed.booking_time;
+    && parsed.party_size && parsed.booking_date && parsed.booking_time;
 
   if (isComplete) {
     const { data: existing } = await sb.from("reservations")
