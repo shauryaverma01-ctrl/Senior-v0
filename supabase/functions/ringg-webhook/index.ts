@@ -24,6 +24,7 @@ import {
   buildTransferredBridgedCard,
   buildCallerHungUpCard,
   buildTransferFailedCard,
+  buildEscalationMissedCard,
   buildFAQLogCard,
   buildIncompleteLogCard,
 } from "../_shared/telegram-cards.ts";
@@ -234,9 +235,14 @@ Deno.serve(async (req) => {
     return new Response("ok", { status: 200 });
   }
 
-  // Fallback dispatcher — by tier:
-  // Tier 1 RED → caller hung up during transfer / staff didn't answer
-  // Tier 3 ✅ → transfer bridged
+  // Fallback dispatcher — three escalation signals, kept distinct:
+  //   transfer_attempted / transfer_succeeded → Plivo HARD facts (always outrank the LLM)
+  //   parsed.escalated                        → LLM SOFT signal (caller wanted a human)
+  // Plivo wins wherever they overlap; the LLM flag is authoritative for exactly ONE case
+  // Plivo can't see: caller asked for staff but Maya never dialed. The LLM flag may NEVER
+  // render a "connected/completed" card — only raise a call-back flag.
+  // Tier 1 RED → caller hung up / staff didn't answer / asked-for-staff-not-transferred
+  // Tier 3 ✅ → transfer bridged (the ONLY card that claims a connection)
   // Tier 4 ℹ️ → FAQ logged
   // Tier 4 📋 → incomplete (bot-only, no clear action)
   let text: string;
@@ -248,10 +254,13 @@ Deno.serve(async (req) => {
     } else {
       text = buildTransferFailedCard(parsed, callerE164, transferOutcomeReason);
     }
+  } else if (!parsed.transfer_attempted && parsed.escalated) {
+    // Plivo saw no dial leg, but the caller asked for a human → bot failed to escalate.
+    text = buildEscalationMissedCard(parsed, callerE164);
   } else if (parsed.intent === "faq") {
     text = buildFAQLogCard(parsed, callerE164);
   } else {
-    // Default fallback (escalation without transfer, incomplete, anything else)
+    // Default fallback (incomplete, anything else)
     text = buildIncompleteLogCard(parsed, callerE164);
   }
 

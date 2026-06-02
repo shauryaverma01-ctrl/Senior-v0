@@ -61,6 +61,12 @@ export interface InternalCallEvent {
   transfer_attempted?: boolean;        // was transfer_call invoked at all?
   transfer_succeeded?: boolean;        // did Plivo accept the transfer (ok=true)?
   transfer_reason?: string | null;     // reason value passed to transfer_call
+  // ── Escalation intent (LLM soft signal, SEPARATE from the Plivo transfer facts above) ──
+  // client_analysis.escalated — caller WANTED / asked for a human. This is authoritative
+  // ONLY for the gap Plivo can't see: caller asked for staff but Maya never dialed.
+  // Plivo (transfer_attempted/succeeded) always outranks this where they overlap; this
+  // flag may NEVER render a "connected/completed" card — only raise a call-back flag.
+  escalated?: boolean;
 }
 
 export interface CapacityResponse {

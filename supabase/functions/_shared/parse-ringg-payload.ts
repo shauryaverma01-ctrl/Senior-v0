@@ -12,8 +12,16 @@ export function parseRinggPayload(raw: any): InternalCallEvent | null {
   const callType = String(raw.call_type ?? "").toLowerCase();
   const isOutbound = callType === "outbound";
 
-  // For outbound: customer is `to_number`. For inbound: customer is `from_number`.
-  const customerPhone = isOutbound ? raw.to_number : raw.from_number;
+  // Customer number resolution.
+  //   OUTBOUND: we dialed them → customer is `to_number`.
+  //   INBOUND: the human who called. On FORWARDED inbound (TBDC main number → Maya),
+  //   `custom_args_values.forwarded_from` holds the FORWARDING TRUNK, NOT the customer —
+  //   it must NEVER be used here. Empirically (40-call sample) custom_args.mobile_number
+  //   and from_number both reliably hold the real customer and agree 100%; prefer
+  //   mobile_number, fall back to from_number, never forwarded_from.
+  const customerPhone = isOutbound
+    ? raw.to_number
+    : (nonEmpty(raw.custom_args_values?.mobile_number) ?? raw.from_number);
   const caller = String(customerPhone ?? "").trim();
 
   const startedAt = raw.called_on ?? raw.created_at ?? new Date().toISOString();
@@ -101,7 +109,24 @@ export function parseRinggPayload(raw: any): InternalCallEvent | null {
   const vendorOffering = nonEmpty(clientAnalysis.offering);
   const staffRole = nonEmpty(clientAnalysis.role_interest);
   const staffExperience = nonEmpty(clientAnalysis.experience_note);
-  const leadCallback = nonEmpty(clientAnalysis.callback_number);
+  // Sanitize the LLM's callback_number. Per the prompt it should ONLY be a DIFFERENT
+  // number the caller stated aloud ("call me back on 98…"). Reject two known false
+  // positives so a legit alternate still wins downstream but poison never does:
+  //   1. the forwarding trunk (custom_args.forwarded_from) — old prompt / LLM sometimes
+  //      copied it here, which is what showed the trunk on Telegram cards.
+  //   2. the caller's own calling number — redundant; dropping it falls through to the
+  //      resolved caller number with an identical result.
+  // Compared smartly (last 10 digits) so a missing +91 / spaces don't defeat the check.
+  const rawCallback = nonEmpty(clientAnalysis.callback_number);
+  const forwardedFrom = nonEmpty(raw.custom_args_values?.forwarded_from);
+  const leadCallback = (rawCallback && !sameNumber(rawCallback, forwardedFrom) && !sameNumber(rawCallback, caller))
+    ? rawCallback
+    : undefined;
+
+  // Escalation soft signal — caller wanted a human. Ringg may stringify booleans
+  // ("true"/"yes"/"1") depending on the dashboard field type, so coerce defensively;
+  // never trust `=== true`. Absent (old-prompt calls) → false.
+  const escalated = boolLike(clientAnalysis.escalated);
 
   // Order intake fields (intent = order_intake)
   const orderTypeRaw = nonEmpty(clientAnalysis.order_type);
@@ -186,6 +211,7 @@ export function parseRinggPayload(raw: any): InternalCallEvent | null {
     transfer_attempted: transferAttempted,
     transfer_succeeded: transferSucceeded,
     transfer_reason: transferReason,
+    escalated,
     vendor_company: vendorCompany,
     vendor_offering: vendorOffering,
     vendor_callback_number: leadCallback,
@@ -372,6 +398,30 @@ function toInt(v: any): number | undefined {
   if (v === null || v === undefined || v === "") return undefined;
   const n = parseInt(String(v).replace(/\D/g, ""), 10);
   return Number.isFinite(n) ? n : undefined;
+}
+
+// Smart phone equality — compares the last 10 significant digits, so "+919711018018",
+// "919711018018", "9711018018", "09711018018" all match regardless of country code /
+// spaces / formatting. Returns false if either side has < 10 digits (can't confidently
+// compare — better to keep a number than wrongly drop it).
+function sameNumber(a?: string, b?: string): boolean {
+  if (!a || !b) return false;
+  const da = String(a).replace(/\D/g, "");
+  const db = String(b).replace(/\D/g, "");
+  if (da.length < 10 || db.length < 10) return false;
+  return da.slice(-10) === db.slice(-10);
+}
+
+// Defensive boolean coercion — mirrors menu-query's boolLike. Ringg sends booleans
+// as real bools OR strings ("true"/"yes"/"1") depending on the dashboard field type.
+// Anything else (absent, "false", "no", "0", "", null) → false.
+function boolLike(v: any): boolean {
+  if (typeof v === "boolean") return v;
+  if (typeof v === "string") {
+    const t = v.trim().toLowerCase();
+    return t === "true" || t === "yes" || t === "1";
+  }
+  return false;
 }
 
 export { normalizeDate, normalizeTime };

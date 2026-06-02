@@ -34,6 +34,16 @@ function historyLine(parsed: InternalCallEvent): string {
   return ch?.known && ch.context ? `\n↩️ <i>${esc(ch.context)}</i>` : "";
 }
 
+// Escalation warning for Layer-1 intent cards (order/vendor/staff): the caller asked
+// for a human (LLM `escalated`) but Plivo never confirmed a bridge. The intent card is
+// still the right primary card; this just flags that the human hand-off didn't land.
+// Plivo's transfer_succeeded outranks the LLM — if it bridged, no warning.
+function escalationWarnLine(parsed: InternalCallEvent): string {
+  return parsed.escalated && !parsed.transfer_succeeded
+    ? "⚠️ <b>Caller asked for staff — not connected</b>"
+    : "";
+}
+
 function compact(lines: (string | null | undefined)[]): string {
   return lines.filter((l) => l && l.trim().length > 0).join("\n");
 }
@@ -74,7 +84,23 @@ export function buildOrderEscalationFailedCard(parsed: InternalCallEvent, caller
     itemsLine,
     parsed.order_instructions ? `📝 ${esc(parsed.order_instructions)}` : null,
     parsed.order_reference ? `🔢 Order ref: <code>${esc(parsed.order_reference)}</code>` : null,
+    escalationWarnLine(parsed) || null,
     "<i>Caller waiting for a callback.</i>",
+    actionItemsBlock(parsed.action_items).trim() || null,
+    listenLine(parsed.audio_url),
+  ]);
+}
+
+// Caller asked for a human (LLM `escalated`) but Maya NEVER attempted a transfer
+// (Plivo has no dial leg). This is the one case Plivo can't see — both a customer
+// callback AND a signal the bot failed to escalate. NEVER claims a connection.
+export function buildEscalationMissedCard(parsed: InternalCallEvent, callerE164: string): string {
+  return compact([
+    "<b>🚨 CALL BACK — asked for staff, not transferred</b>",
+    parsed.customer_name ? `👤 ${esc(parsed.customer_name)} · ${esc(callerE164)}` : `📞 ${esc(callerE164)}`,
+    historyLine(parsed).trim() || null,
+    parsed.guest_brief ? `💬 ${esc(parsed.guest_brief)}` : null,
+    "<i>Caller wanted a person — the call was not handed off. Please call back.</i>",
     actionItemsBlock(parsed.action_items).trim() || null,
     listenLine(parsed.audio_url),
   ]);
@@ -159,6 +185,7 @@ export function buildVendorCard(parsed: InternalCallEvent): string {
     parsed.vendor_offering ? `📦 ${esc(parsed.vendor_offering)}` : null,
     `📞 ${esc(parsed.vendor_callback_number ?? parsed.caller_number)}`,
     historyLine(parsed).trim() || null,
+    escalationWarnLine(parsed) || null,
     keyPointsBlock(parsed.key_points).trim() || null,
     actionItemsBlock(parsed.action_items).trim() || null,
     listenLine(parsed.audio_url),
@@ -172,6 +199,7 @@ export function buildStaffLeadCard(parsed: InternalCallEvent): string {
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)}${parsed.staff_role_interest ? ` · ${esc(parsed.staff_role_interest)}` : ""}${parsed.staff_experience_note ? ` · ${esc(parsed.staff_experience_note)}` : ""}` : null,
     `📞 ${esc(parsed.staff_callback_number ?? parsed.caller_number)}`,
     historyLine(parsed).trim() || null,
+    escalationWarnLine(parsed) || null,
     keyPointsBlock(parsed.key_points).trim() || null,
     actionItemsBlock(parsed.action_items).trim() || null,
     listenLine(parsed.audio_url),
