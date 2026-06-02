@@ -44,6 +44,13 @@ function escalationWarnLine(parsed: InternalCallEvent): string {
     : "";
 }
 
+// Standard "what the caller wanted + how it ended" one-liner, shown on EVERY card so the
+// manager always has context at a glance. Empty when no brief exists (e.g. broken/empty
+// calls, or transfer calls where the webhook cleared unreliable Ringg data).
+function briefBlock(parsed: InternalCallEvent): string {
+  return parsed.guest_brief ? `💬 <i>${esc(parsed.guest_brief)}</i>` : "";
+}
+
 function compact(lines: (string | null | undefined)[]): string {
   return lines.filter((l) => l && l.trim().length > 0).join("\n");
 }
@@ -55,6 +62,7 @@ export function buildCallerHungUpCard(parsed: InternalCallEvent, callerE164: str
     "<b>🚨 CALL BACK NOW</b>",
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)} · ${esc(callerE164)}` : `📞 ${esc(callerE164)}`,
     historyLine(parsed).trim() || null,
+    briefBlock(parsed) || null,
     parsed.transfer_reason ? `Reason: <code>${esc(parsed.transfer_reason)}</code>` : null,
     "<i>Caller dropped before staff answered.</i>",
     actionItemsBlock(parsed.action_items).trim() || null,
@@ -67,6 +75,7 @@ export function buildTransferFailedCard(parsed: InternalCallEvent, callerE164: s
     "<b>🚨 STAFF DIDN'T ANSWER — CALL BACK</b>",
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)} · ${esc(callerE164)}` : `📞 ${esc(callerE164)}`,
     historyLine(parsed).trim() || null,
+    briefBlock(parsed) || null,
     parsed.transfer_reason ? `Reason: <code>${esc(parsed.transfer_reason)}</code>` : null,
     `<i>Caller heard apology and hung up. Dial outcome: ${esc(outcomeReason ?? "no_answer")}.</i>`,
     actionItemsBlock(parsed.action_items).trim() || null,
@@ -81,6 +90,7 @@ export function buildOrderEscalationFailedCard(parsed: InternalCallEvent, caller
   return compact([
     "<b>🚨 ORDER — STAFF DIDN'T ANSWER</b>",
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)} · ${esc(parsed.order_callback_number ?? callerE164)}` : `📞 ${esc(parsed.order_callback_number ?? callerE164)}`,
+    briefBlock(parsed) || null,
     itemsLine,
     parsed.order_instructions ? `📝 ${esc(parsed.order_instructions)}` : null,
     parsed.order_reference ? `🔢 Order ref: <code>${esc(parsed.order_reference)}</code>` : null,
@@ -99,7 +109,7 @@ export function buildEscalationMissedCard(parsed: InternalCallEvent, callerE164:
     "<b>🚨 CALL BACK — asked for staff, not transferred</b>",
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)} · ${esc(callerE164)}` : `📞 ${esc(callerE164)}`,
     historyLine(parsed).trim() || null,
-    parsed.guest_brief ? `💬 ${esc(parsed.guest_brief)}` : null,
+    briefBlock(parsed) || null,
     "<i>Caller wanted a person — the call was not handed off. Please call back.</i>",
     actionItemsBlock(parsed.action_items).trim() || null,
     listenLine(parsed.audio_url),
@@ -112,6 +122,7 @@ export function buildDBErrorCard(parsed: InternalCallEvent, callerE164: string):
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)}${parsed.party_size ? ` · party of ${parsed.party_size}` : ""}` : null,
     parsed.booking_date && parsed.booking_time ? `📅 ${esc(parsed.booking_date)} · ${esc(parsed.booking_time)}` : null,
     `📞 ${esc(callerE164)}`,
+    briefBlock(parsed) || null,
     "<i>Booking failed to save. Call back to confirm.</i>",
     listenLine(parsed.audio_url),
   ]);
@@ -158,7 +169,7 @@ export function buildTransferredBridgedCard(parsed: InternalCallEvent, callerE16
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)} · ${esc(callerE164)}` : `📞 ${esc(callerE164)}`,
     parsed.transfer_reason ? `Reason: <code>${esc(parsed.transfer_reason)}</code>` : null,
     "<i>Staff answered. Conversation completed.</i>",
-    parsed.guest_brief ? `\n💬 ${esc(parsed.guest_brief)}` : null,
+    briefBlock(parsed) || null,
     listenLine(parsed.audio_url),
   ]);
 }
@@ -170,6 +181,7 @@ export function buildOrderHandledCard(parsed: InternalCallEvent, callerE164: str
   return compact([
     "<b>📦 Order handled</b>",
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)} · ${esc(parsed.order_callback_number ?? callerE164)}` : `📞 ${esc(parsed.order_callback_number ?? callerE164)}`,
+    briefBlock(parsed) || null,
     itemsLine,
     parsed.order_instructions ? `📝 ${esc(parsed.order_instructions)}` : null,
     "<i>Caller was connected to staff. Conversation completed.</i>",
@@ -185,6 +197,7 @@ export function buildVendorCard(parsed: InternalCallEvent): string {
     parsed.vendor_offering ? `📦 ${esc(parsed.vendor_offering)}` : null,
     `📞 ${esc(parsed.vendor_callback_number ?? parsed.caller_number)}`,
     historyLine(parsed).trim() || null,
+    briefBlock(parsed) || null,
     escalationWarnLine(parsed) || null,
     keyPointsBlock(parsed.key_points).trim() || null,
     actionItemsBlock(parsed.action_items).trim() || null,
@@ -199,6 +212,7 @@ export function buildStaffLeadCard(parsed: InternalCallEvent): string {
     parsed.customer_name ? `👤 ${esc(parsed.customer_name)}${parsed.staff_role_interest ? ` · ${esc(parsed.staff_role_interest)}` : ""}${parsed.staff_experience_note ? ` · ${esc(parsed.staff_experience_note)}` : ""}` : null,
     `📞 ${esc(parsed.staff_callback_number ?? parsed.caller_number)}`,
     historyLine(parsed).trim() || null,
+    briefBlock(parsed) || null,
     escalationWarnLine(parsed) || null,
     keyPointsBlock(parsed.key_points).trim() || null,
     actionItemsBlock(parsed.action_items).trim() || null,
@@ -212,10 +226,14 @@ export function buildStaffLeadCard(parsed: InternalCallEvent): string {
 export function buildFAQLogCard(parsed: InternalCallEvent, callerE164: string): string {
   const who = parsed.customer_name ? esc(parsed.customer_name) : esc(callerE164);
   const dur = parsed.duration_seconds ? `${parsed.duration_seconds}s` : "";
-  const summary = parsed.summary ? `\n<i>${esc(parsed.summary.slice(0, 120))}${parsed.summary.length > 120 ? "…" : ""}</i>` : "";
+  // Prefer the AI's one-line brief (what they wanted + how it ended); fall back to the
+  // longer platform summary (trimmed) only when no brief was produced.
+  const line = parsed.guest_brief
+    ? esc(parsed.guest_brief)
+    : (parsed.summary ? `${esc(parsed.summary.slice(0, 120))}${parsed.summary.length > 120 ? "…" : ""}` : "");
   return compact([
     `ℹ️ FAQ logged · ${who}${dur ? ` · ${dur}` : ""}`,
-    summary.trim() || null,
+    line ? `<i>${line}</i>` : null,
     listenLine(parsed.audio_url),
   ]);
 }
@@ -223,12 +241,18 @@ export function buildFAQLogCard(parsed: InternalCallEvent, callerE164: string): 
 export function buildIncompleteLogCard(parsed: InternalCallEvent, callerE164: string): string {
   const who = parsed.customer_name ? esc(parsed.customer_name) : esc(callerE164);
   const dur = parsed.duration_seconds ? `${parsed.duration_seconds}s` : "";
-  const reason = parsed.classification === "bot_only_user_no_response"
-    ? "Bot only, no caller response."
-    : "Call ended without clear action.";
+  // Prefer the AI's plain-English brief so the manager sees WHAT was attempted and HOW it
+  // ended (e.g. "Wanted a table for 4 but no time was confirmed") instead of a useless
+  // "Call ended without clear action". Fall back to a canned reason only when there's no
+  // brief — i.e. a genuinely empty / bot-only call.
+  const detail = parsed.guest_brief
+    ? esc(parsed.guest_brief)
+    : (parsed.classification === "bot_only_user_no_response"
+        ? "Bot only, no caller response."
+        : "Call ended without clear action.");
   return compact([
     `📋 Incomplete · ${who}${dur ? ` · ${dur}` : ""}`,
-    `<i>${esc(reason)}</i>`,
+    `<i>${detail}</i>`,
     listenLine(parsed.audio_url),
   ]);
 }
