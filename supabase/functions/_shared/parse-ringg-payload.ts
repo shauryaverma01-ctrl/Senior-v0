@@ -402,7 +402,13 @@ function detectDiscount(transcript: any[]): boolean {
 function nonEmpty(v: any): string | undefined {
   if (v === null || v === undefined) return undefined;
   const s = String(v).trim();
-  return s.length > 0 ? s : undefined;
+  if (s.length === 0) return undefined;
+  // Ringg / the LLM sometimes emit the literal strings "null" / "undefined" / "N/A" as an
+  // actual field value (e.g. caller_name="null" rendered "null · +91…" on a card). Treat
+  // these junk literals as missing so they never reach a card or the DB.
+  const low = s.toLowerCase();
+  if (low === "null" || low === "undefined" || low === "n/a") return undefined;
+  return s;
 }
 
 function toInt(v: any): number | undefined {
