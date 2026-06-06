@@ -5,12 +5,12 @@
 // Returns:
 //   <?xml version="1.0" encoding="UTF-8"?>
 //   <Response>
-//     <Dial timeout="25" timeLimit="600">
+//     <Dial timeout="60" timeLimit="600">
 //       <Number>+919876543210</Number>
 //     </Dial>
 //   </Response>
 //
-// timeout=25s: how long to ring manager before giving up
+// timeout=60s: how long to ring manager before giving up (see note by the <Dial> below)
 // timeLimit=600s: 10-minute cap on the bridged conversation
 //
 // Important: this endpoint must NOT require auth — Plivo fetches it without bearer tokens.
@@ -44,14 +44,19 @@ Deno.serve((req) => {
   const actionUrl = `${projectUrl}/functions/v1/transfer-fallback`;
 
   console.log({ event: "transfer_xml_dialing", to, callerId, actionUrl });
-  // 15s timeout is intentional: TBDC's PBX conditional-forward to Maya fires at ~20s.
-  // We must give up dialing BEFORE that, otherwise Plivo sees the PBX answer (forwarding)
-  // as a successful bridge and bounces the customer back to Maya — infinite loop.
-  // 15s = ~3 rings, enough for a present manager; falls through to transfer-fallback
-  // (apology + hangup) if not picked up.
+  // timeout=60s: ring the manager's mobile long enough that they can actually reach the
+  // phone. Plivo logs showed real "Ring Timeout Reached" hangups at the old 15s — the
+  // phone was ringing but the manager couldn't answer in time.
+  //
+  // ⚠️ The old 15s value existed ONLY to beat TBDC's PBX conditional-forward (~20s): if
+  // we ever escalate to the TBDC MAIN line again (not a direct mobile), a >20s timeout
+  // lets Plivo see the PBX forward-answer as a bridge and bounces the caller back to Maya
+  // — an infinite loop. So: keep this <20s ONLY if MANAGER_ESCALATION_PHONE is the TBDC
+  // main number. For a direct manager mobile (current setup) the loop can't happen, so a
+  // long ring is correct.
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Dial timeout="15" timeLimit="600" callerId="${esc(callerId)}" hangupOnStar="false" action="${esc(actionUrl)}" method="POST">
+  <Dial timeout="60" timeLimit="600" callerId="${esc(callerId)}" hangupOnStar="false" action="${esc(actionUrl)}" method="POST">
     <Number>${esc(to)}</Number>
   </Dial>
 </Response>`;
